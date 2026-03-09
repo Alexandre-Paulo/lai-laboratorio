@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Rescisão Inteligente - LAI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --bg: #f8fafc;
+            --text: #1e293b;
+        }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+        header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #eee; padding-bottom: 20px; }
+        h1 { color: var(--primary); margin: 0; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; }
+        button { background: var(--primary); color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; width: 100%; font-size: 16px; font-weight: 600; transition: background 0.3s; }
+        button:hover { background: #1d4ed8; }
+        #resultadoIA { margin-top: 25px; padding: 20px; border-left: 4px solid var(--primary); background: #eff6ff; display: none; line-height: 1.6; }
+        .loading { display: none; text-align: center; color: var(--primary); font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>LAI - Laboratório de Apps Inteligentes</h1>
+        <p>Calculadora de Rescisão com Análise Especializada (IA)</p>
+    </header>
+
+    <div class="form-group">
+        <label>Motivo da Saída:</label>
+        <select id="motivo">
+            <option value="sem_justa_causa">Pedido de Demissão</option>
+            <option value="com_justa_causa">Demissão sem Justa Causa</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>Salário Bruto (R$):</label>
+        <input type="number" id="salario" placeholder="Ex: 2500">
+    </div>
+
+    <div class="form-group">
+        <label>Tempo de Empresa (Meses):</label>
+        <input type="number" id="meses" placeholder="Ex: 12">
+    </div>
+
+    <button onclick="analisarRescisao()">Analisar com IA</button>
+
+    <div id="loading" class="loading">Consultando o Gemini... Aguarde.</div>
+    <div id="resultadoIA"></div>
+</div>
+
+<script>
+    async function analisarRescisao() {
+        const motivo = document.getElementById('motivo').value;
+        const salario = document.getElementById('salario').value;
+        const meses = document.getElementById('meses').value;
+        const resultadoDiv = document.getElementById('resultadoIA');
+        const loadingDiv = document.getElementById('loading');
+
+        if(!salario || !meses) {
+            alert("Por favor, preencha o salário e o tempo de empresa.");
+            return;
+        }
+
+        const dadosParaIA = `Motivo: ${motivo}, Salário: R$ ${salario}, Tempo: ${meses} meses.`;
+
+        loadingDiv.style.display = 'block';
+        resultadoDiv.style.display = 'none';
+
+        try {
+            // AQUI É A MÁGICA: Chamando a sua ponte na Vercel!
+            const response = await fetch('/api/analise', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ dados: dadosParaIA })
+            });
+
+            const data = await response.json();
+            
+            // Formatando a resposta da IA para aparecer no site
+            resultadoDiv.innerHTML = "<h3>Análise Especializada:</h3>" + data.resposta.replace(/\n/g, '<br>');
+            resultadoDiv.style.display = 'block';
+        } catch (error) {
+            resultadoDiv.innerHTML = "Erro ao processar análise. Verifique sua conexão.";
+            resultadoDiv.style.display = 'block';
+        } finally {
+            loadingDiv.style.display = 'none';
+        }
+    }
+</script>
+
+</body>
+</html>
