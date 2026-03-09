@@ -76,7 +76,7 @@
 
         try {
             // AQUI É A MÁGICA: Chamando a sua ponte na Vercel!
-            const response = await fetch('/api/analise', {
+            const response = await fetch('/api/analise.js', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ dados: dadosParaIA })
