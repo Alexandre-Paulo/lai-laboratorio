@@ -3,96 +3,239 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Rescisão Inteligente - LAI</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <title>LAI - Laboratório de Apps Inteligentes</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root {
-            --primary: #2563eb;
-            --bg: #f8fafc;
-            --text: #1e293b;
+            --primary: #00f2ff;
+            --secondary: #0066ff;
+            --bg: #0a0b10;
+            --panel: rgba(20, 25, 40, 0.8);
+            --text: #e0e6ed;
         }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 20px; }
-        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
-        header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #eee; padding-bottom: 20px; }
-        h1 { color: var(--primary); margin: 0; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: 600; }
-        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; }
-        button { background: var(--primary); color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; width: 100%; font-size: 16px; font-weight: 600; transition: background 0.3s; }
-        button:hover { background: #1d4ed8; }
-        #resultadoIA { margin-top: 25px; padding: 20px; border-left: 4px solid var(--primary); background: #eff6ff; display: none; line-height: 1.6; }
-        .loading { display: none; text-align: center; color: var(--primary); font-weight: bold; }
+
+        body {
+            background-color: var(--bg);
+            background-image: radial-gradient(circle at 50% 50%, #1a1f35 0%, #0a0b10 100%);
+            color: var(--text);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background: var(--panel);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 242, 255, 0.2);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(0, 242, 255, 0.05);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 5px;
+            text-shadow: 0 0 15px rgba(0, 242, 255, 0.5);
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 0.9em;
+            color: #8892b0;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--primary);
+            font-weight: bold;
+            font-size: 0.85em;
+            text-transform: uppercase;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #2d3748;
+            border-radius: 5px;
+            color: white;
+            box-sizing: border-box;
+            transition: 0.3s;
+        }
+
+        select:focus, input:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 10px rgba(0, 242, 255, 0.2);
+        }
+
+        .btn-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            flex: 1;
+            padding: 15px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: 0.3s;
+        }
+
+        #btnAnalisar {
+            background: linear-gradient(90deg, var(--secondary), var(--primary));
+            color: #000;
+        }
+
+        #btnAnalisar:hover {
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.6);
+            transform: translateY(-2px);
+        }
+
+        #btnPDF {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            display: none; /* Escondido até ter resultado */
+        }
+
+        #resultado {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            border-left: 4px solid var(--primary);
+            line-height: 1.6;
+            display: none;
+            white-space: pre-wrap;
+        }
+
+        .loading {
+            text-align: center;
+            display: none;
+            color: var(--primary);
+            font-style: italic;
+        }
+
+        /* Estilo para o PDF não ficar preto */
+        .pdf-content {
+            color: #333 !important;
+            background: white !important;
+            padding: 40px !important;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <header>
-        <h1>LAI - Laboratório de Apps Inteligentes</h1>
-        <p>Calculadora de Rescisão com Análise Especializada (IA)</p>
-    </header>
+    <h1>LAI <span style="font-weight: 200;">CORE</span></h1>
+    <div class="subtitle">Módulo de Análise Rescisória v2.0</div>
 
-    <div class="form-group">
-        <label>Motivo da Saída:</label>
+    <div class="input-group">
+        <label>Motivo da Saída</label>
         <select id="motivo">
-            <option value="sem_justa_causa">Pedido de Demissão</option>
-            <option value="com_justa_causa">Demissão sem Justa Causa</option>
+            <option value="Demissão sem Justa Causa">Demissão sem Justa Causa</option>
+            <option value="Pedido de Demissão">Pedido de Demissão</option>
+            <option value="Justa Causa">Justa Causa</option>
         </select>
     </div>
 
-    <div class="form-group">
-        <label>Salário Bruto (R$):</label>
-        <input type="number" id="salario" placeholder="Ex: 2500">
+    <div class="input-group">
+        <label>Salário Bruto (R$)</label>
+        <input type="number" id="salario" placeholder="Ex: 3500">
     </div>
 
-    <div class="form-group">
-        <label>Tempo de Empresa (Meses):</label>
-        <input type="number" id="meses" placeholder="Ex: 12">
+    <div class="input-group">
+        <label>Tempo de Empresa (Meses)</label>
+        <input type="number" id="meses" placeholder="Ex: 14">
     </div>
 
-    <button onclick="analisarRescisao()">Analisar com IA</button>
+    <div class="btn-container">
+        <button id="btnAnalisar" onclick="analisar()">Iniciar Processamento</button>
+        <button id="btnPDF" onclick="gerarPDF()">Exportar Relatório</button>
+    </div>
 
-    <div id="loading" class="loading">Consultando o Gemini... Aguarde.</div>
-    <div id="resultadoIA"></div>
+    <div id="loading" class="loading">Sincronizando com Gemini 3 Core...</div>
+    <div id="resultado"></div>
 </div>
 
 <script>
-    async function analisarRescisao() {
+    async function analisar() {
         const motivo = document.getElementById('motivo').value;
         const salario = document.getElementById('salario').value;
         const meses = document.getElementById('meses').value;
-        const resultadoDiv = document.getElementById('resultadoIA');
-        const loadingDiv = document.getElementById('loading');
+        const resDiv = document.getElementById('resultado');
+        const loadDiv = document.getElementById('loading');
+        const btnPDF = document.getElementById('btnPDF');
 
-        if(!salario || !meses) {
-            alert("Por favor, preencha o salário e o tempo de empresa.");
+        if (!salario || !meses) {
+            alert("Por favor, preencha todos os dados.");
             return;
         }
 
-        const dadosParaIA = `Motivo: ${motivo}, Salário: R$ ${salario}, Tempo: ${meses} meses.`;
+        resDiv.style.display = 'none';
+        btnPDF.style.display = 'none';
+        loadDiv.style.display = 'block';
 
-        loadingDiv.style.display = 'block';
-        resultadoDiv.style.display = 'none';
+        const dadosPrompt = `Motivo: ${motivo}, Salário: ${salario}, Tempo: ${meses} meses.`;
 
         try {
-            // AQUI É A MÁGICA: Chamando a sua ponte na Vercel!
             const response = await fetch('/api/analise.js', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ dados: dadosParaIA })
+                body: JSON.stringify({ dados: dadosPrompt })
             });
 
             const data = await response.json();
             
-            // Formatando a resposta da IA para aparecer no site
-            resultadoDiv.innerHTML = "<h3>Análise Especializada:</h3>" + data.resposta.replace(/\n/g, '<br>');
-            resultadoDiv.style.display = 'block';
-        } catch (error) {
-            resultadoDiv.innerHTML = "Erro ao processar análise. Verifique sua conexão.";
-            resultadoDiv.style.display = 'block';
+            if (data.resposta) {
+                resDiv.innerHTML = "<strong>RELATÓRIO DE ANÁLISE:</strong>\n\n" + data.resposta;
+                resDiv.style.display = 'block';
+                btnPDF.style.display = 'block';
+            } else {
+                resDiv.innerText = "Erro: " + (data.error || "Resposta vazia");
+                resDiv.style.display = 'block';
+            }
+        } catch (e) {
+            resDiv.innerText = "Erro na conexão.";
+            resDiv.style.display = 'block';
         } finally {
-            loadingDiv.style.display = 'none';
+            loadDiv.style.display = 'none';
         }
+    }
+
+    function gerarPDF() {
+        const elemento = document.getElementById('resultado');
+        const opt = {
+            margin: 10,
+            filename: 'analise-rescisao.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        
+        // Criamos uma cópia temporária com fundo branco para o PDF ficar legível
+        const clone = elemento.cloneNode(true);
+        clone.classList.add('pdf-content');
+        
+        html2pdf().set(opt).from(clone).save();
     }
 </script>
 
