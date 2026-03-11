@@ -6,210 +6,184 @@
     <title>LAI - Consultoria</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        :root {
-            /* TEMA CLARO - CORRIGIDO */
-            --bg: #f7fafc;
-            --card: #ffffff;
-            --primary: #1a365d;
-            --accent: #2b6cb0;
-            --text-main: #2d3748;
-            --text-muted: #718096;
-            --border: #e2e8f0;
-            --input-bg: #ffffff;
+        /* TEMA CLARO FORÇADO */
+        :root, [data-theme="light"] {
+            --cor-fundo: #f7fafc;
+            --cor-card: #ffffff;
+            --cor-texto: #2d3748;
+            --cor-primaria: #1a365d;
+            --cor-borda: #e2e8f0;
         }
 
+        /* TEMA ESCURO FORÇADO */
         [data-theme="dark"] {
-            /* TEMA ESCURO - CORRIGIDO */
-            --bg: #1a202c;
-            --card: #2d3748;
-            --primary: #90cdf4;
-            --accent: #4299e1;
-            --text-main: #f7fafc;
-            --text-muted: #a0aec0;
-            --border: #4a5568;
-            --input-bg: #1a202c;
+            --cor-fundo: #1a202c;
+            --cor-card: #2d3748;
+            --cor-texto: #f7fafc;
+            --cor-primaria: #90cdf4;
+            --cor-borda: #4a5568;
         }
 
         body {
-            background-color: var(--bg);
-            color: var(--text-main);
-            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--cor-fundo);
+            color: var(--cor-texto);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
             min-height: 100vh;
-            transition: background-color 0.3s, color 0.3s;
+            transition: 0.3s;
         }
 
-        .theme-selector {
-            margin-bottom: 25px;
+        .config-bar {
+            margin-bottom: 20px;
+            background: var(--cor-card);
+            padding: 10px 20px;
+            border-radius: 30px;
+            border: 1px solid var(--cor-borda);
             display: flex;
             align-items: center;
-            gap: 12px;
-            background: var(--card);
-            padding: 8px 16px;
-            border-radius: 50px;
-            border: 1px solid var(--border);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            gap: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
-        .theme-label {
+        .config-label {
             font-size: 0.7em;
-            font-weight: 800;
-            color: var(--text-muted);
+            font-weight: bold;
+            color: var(--cor-primaria);
             letter-spacing: 1px;
         }
 
-        .theme-btn {
-            padding: 6px 12px;
-            font-size: 1em;
-            cursor: pointer;
-            border-radius: 20px;
+        .btn-tema {
+            background: none;
             border: 1px solid transparent;
-            background: transparent;
+            cursor: pointer;
+            font-size: 1.2em;
+            padding: 5px;
+            border-radius: 50%;
             transition: 0.2s;
         }
 
-        .theme-btn:hover {
-            background: var(--bg);
-            border-color: var(--border);
+        .btn-tema:hover {
+            background: rgba(0,0,0,0.05);
+            border-color: var(--cor-borda);
         }
 
         .container {
             width: 90%;
-            max-width: 600px;
-            background: var(--card);
-            border-radius: 16px;
+            max-width: 500px;
+            background: var(--cor-card);
             padding: 40px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            border: 1px solid var(--border);
+            border-radius: 15px;
+            border: 1px solid var(--cor-borda);
+            box-shadow: 0 10px 15px rgba(0,0,0,0.1);
         }
 
-        .header h1 { color: var(--primary); margin: 0; text-align: center; font-size: 1.8em; }
-        .subtitle { color: var(--text-muted); text-align: center; margin-bottom: 30px; font-size: 0.9em; }
-
-        label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.85em; color: var(--text-muted); }
-        select, input {
-            width: 100%; padding: 12px; margin-bottom: 20px;
-            background: var(--input-bg); border: 1px solid var(--border);
-            border-radius: 8px; color: var(--text-main); box-sizing: border-box;
-        }
-
-        .actions { display: flex; gap: 10px; flex-wrap: wrap; }
-        button { flex: 1; padding: 14px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        h1 { color: var(--cor-primaria); text-align: center; margin-top: 0; }
         
-        #btnAnalisar { background: var(--accent); color: white; }
-        #btnAnalisar:disabled { opacity: 0.5; cursor: not-allowed; }
-        #btnReset { background: transparent; border: 1px solid var(--border); color: var(--text-muted); }
-        #btnPDF { background: #38a169; color: white; display: none; }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0 20px 0;
+            border-radius: 8px;
+            border: 1px solid var(--cor-borda);
+            background: var(--cor-fundo);
+            color: var(--cor-texto);
+            box-sizing: border-box;
+        }
+
+        .btn-principal {
+            width: 100%;
+            padding: 15px;
+            background: #2b6cb0;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-principal:disabled { background: #a0aec0; }
 
         #resultado {
-            margin-top: 30px; padding: 25px; background: rgba(0,0,0,0.02);
-            border-radius: 8px; border: 1px dashed var(--border); display: none;
-            white-space: pre-wrap; line-height: 1.6; color: var(--text-main);
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px dashed var(--cor-borda);
+            display: none;
+            white-space: pre-wrap;
         }
     </style>
 </head>
 <body>
 
-    <div class="theme-selector">
-        <span class="theme-label">APARÊNCIA</span>
-        <button class="theme-btn" title="Modo Claro" onclick="setTheme('light')">☀️</button>
-        <button class="theme-btn" title="Modo Escuro" onclick="setTheme('dark')">🌙</button>
-        <button class="theme-btn" title="Automático" onclick="setTheme('auto')">💻</button>
+    <div class="config-bar">
+        <span class="config-label">APARÊNCIA</span>
+        <button class="btn-tema" onclick="mudarTema('light')">☀️</button>
+        <button class="btn-tema" onclick="mudarTema('dark')">🌙</button>
+        <button class="btn-tema" onclick="mudarTema('auto')">💻</button>
     </div>
 
     <div class="container">
-        <div class="header">
-            <h1>LAI - Consultoria</h1>
-            <p class="subtitle">Análise Rescisória Inteligente</p>
-        </div>
-
-        <label>MOTIVO DA SAÍDA</label>
+        <h1>LAI Consultoria</h1>
+        
+        <label>Motivo</label>
         <select id="motivo">
-            <option value="Demissão sem Justa Causa">Demissão sem Justa Causa</option>
+            <option value="Demissão sem Justa Causa">Sem Justa Causa</option>
             <option value="Pedido de Demissão">Pedido de Demissão</option>
-            <option value="Justa Causa">Justa Causa</option>
         </select>
 
-        <label>SALÁRIO BRUTO (R$)</label>
-        <input type="number" id="salario" placeholder="Ex: 3000">
+        <label>Salário (R$)</label>
+        <input type="number" id="salario" placeholder="3000">
 
-        <label>TEMPO DE EMPRESA (MESES)</label>
-        <input type="number" id="meses" placeholder="Ex: 12">
+        <label>Meses</label>
+        <input type="number" id="meses" placeholder="12">
 
-        <div class="actions">
-            <button id="btnAnalisar" onclick="analisar()">GERAR ANÁLISE</button>
-            <button id="btnReset" onclick="resetar()">NOVA CONSULTA</button>
-            <button id="btnPDF" onclick="gerarPDF()">BAIXAR PDF</button>
-        </div>
-
+        <button id="btnAnalisar" class="btn-principal" onclick="executar()">GERAR ANÁLISE</button>
+        
         <div id="resultado"></div>
     </div>
 
     <script>
-        function setTheme(theme) {
-            const body = document.body;
-            if (theme === 'auto') {
-                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                body.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+        function mudarTema(t) {
+            const html = document.documentElement;
+            if (t === 'auto') {
+                const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                html.setAttribute('data-theme', dark ? 'dark' : 'light');
             } else {
-                body.setAttribute('data-theme', theme);
+                html.setAttribute('data-theme', t);
             }
-            localStorage.setItem('lai-theme', theme);
+            localStorage.setItem('tema-preferido', t);
         }
 
-        setTheme(localStorage.getItem('lai-theme') || 'auto');
+        // Aplicar tema ao carregar
+        mudarTema(localStorage.getItem('tema-preferido') || 'auto');
 
-        async function analisar() {
+        async function executar() {
             const btn = document.getElementById('btnAnalisar');
-            const resDiv = document.getElementById('resultado');
-            const s = document.getElementById('salario').value;
-            const m = document.getElementById('meses').value;
-
-            if(!s || !m) return alert("Preencha os campos.");
-
+            const res = document.getElementById('resultado');
+            
             btn.disabled = true;
-            btn.innerText = "PROCESSANDO...";
+            btn.innerText = "IA PROCESSANDO...";
 
             try {
                 const response = await fetch('/api/analise.js', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ dados: `Salário: ${s}, Meses: ${m}, Motivo: ${document.getElementById('motivo').value}` })
+                    body: JSON.stringify({ 
+                        dados: `Salário: ${document.getElementById('salario').value}, Meses: ${document.getElementById('meses').value}, Motivo: ${document.getElementById('motivo').value}` 
+                    })
                 });
                 const data = await response.json();
-                if (data.resposta) {
-                    resDiv.innerHTML = "<strong>PARECER TÉCNICO:</strong>\n\n" + data.resposta;
-                    resDiv.style.display = 'block';
-                    document.getElementById('btnPDF').style.display = 'block';
-                }
+                res.innerHTML = data.resposta;
+                res.style.display = 'block';
             } catch (e) {
-                alert("Erro na conexão.");
+                alert("Erro ao conectar.");
             } finally {
                 btn.innerText = "GERAR ANÁLISE";
-                // Trava de 10 segundos para não ser tão restritivo no teste
-                setTimeout(() => { btn.disabled = false; }, 10000);
+                setTimeout(() => btn.disabled = false, 5000);
             }
-        }
-
-        function resetar() {
-            document.getElementById('salario').value = '';
-            document.getElementById('meses').value = '';
-            document.getElementById('resultado').style.display = 'none';
-            document.getElementById('btnPDF').style.display = 'none';
-            document.getElementById('btnAnalisar').disabled = false;
-        }
-
-        function gerarPDF() {
-            const elemento = document.getElementById('resultado');
-            const clone = elemento.cloneNode(true);
-            clone.style.color = "black";
-            clone.style.background = "white";
-            clone.style.padding = "20px";
-            html2pdf().from(clone).save('Analise_Rescisao.pdf');
         }
     </script>
 </body>
