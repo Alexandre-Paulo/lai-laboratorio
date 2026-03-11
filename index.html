@@ -3,220 +3,204 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LAI - CORE INTERFACE</title>
+    <title>LAI - Consultoria de Rescisão Inteligente</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root {
-            --primary: #00f2ff;
-            --secondary: #0066ff;
-            --bg: #05070a;
-            --panel: rgba(10, 15, 25, 0.9);
-            --text: #e0e6ed;
-            --grid: rgba(0, 242, 255, 0.05);
+            --primary: #1a365d; /* Azul Marinho Profissional */
+            --accent: #2b6cb0;
+            --bg: #f7fafc;
+            --card: #ffffff;
+            --text-main: #2d3748;
+            --text-muted: #718096;
         }
 
         body {
             background-color: var(--bg);
-            /* Fundo com efeito de grade futurista */
-            background-image: 
-                linear-gradient(var(--grid) 1px, transparent 1px),
-                linear-gradient(90deg, var(--grid) 1px, transparent 1px),
-                radial-gradient(circle at 50% 50%, #101525 0%, #05070a 100%);
-            background-size: 30px 30px, 30px 30px, 100% 100%;
-            color: var(--text);
-            font-family: 'Segoe UI', 'Courier New', monospace;
+            color: var(--text-main);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             margin: 0;
+            padding: 20px;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            overflow-x: hidden;
         }
 
         .container {
-            width: 90%;
-            max-width: 850px;
-            background: var(--panel);
-            backdrop-filter: blur(15px);
-            border: 2px solid var(--secondary);
-            border-radius: 5px;
+            width: 100%;
+            max-width: 700px;
+            background: var(--card);
+            border-radius: 12px;
             padding: 40px;
-            position: relative;
-            box-shadow: 0 0 50px rgba(0, 102, 255, 0.2);
-            /* Detalhe de canto HUD */
-            clip-path: polygon(0% 15%, 5% 0%, 100% 0%, 100% 85%, 95% 100%, 0% 100%);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
         }
 
-        /* Linha decorativa no topo */
-        .container::before {
-            content: "";
-            position: absolute;
-            top: 0; left: 10%; width: 80%; height: 2px;
-            background: var(--primary);
-            box-shadow: 0 0 15px var(--primary);
+        .header {
+            text-align: center;
+            margin-bottom: 35px;
+            border-bottom: 2px solid #edf2f7;
+            padding-bottom: 20px;
         }
 
         h1 {
-            text-align: center;
             color: var(--primary);
-            letter-spacing: 8px;
-            font-size: 2.5em;
-            margin-bottom: 5px;
-            text-shadow: 0 0 20px rgba(0, 242, 255, 0.7);
+            font-size: 1.8em;
+            margin: 0;
+            letter-spacing: -0.5px;
         }
 
         .subtitle {
-            text-align: center;
-            font-size: 0.7em;
-            color: var(--secondary);
-            text-transform: uppercase;
-            letter-spacing: 5px;
-            margin-bottom: 40px;
+            color: var(--text-muted);
+            font-size: 0.95em;
+            margin-top: 5px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
         }
 
         label {
             display: block;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 0.9em;
             color: var(--primary);
-            font-size: 0.75em;
-            text-transform: uppercase;
-            letter-spacing: 2px;
         }
 
         select, input {
             width: 100%;
-            padding: 15px;
-            background: rgba(0, 0, 0, 0.6);
-            border: 1px solid var(--secondary);
-            border-radius: 0;
-            color: var(--primary);
-            font-family: monospace;
-            margin-bottom: 25px;
-            transition: 0.3s;
+            padding: 12px 15px;
+            background: #fff;
+            border: 1px solid #cbd5e0;
+            border-radius: 8px;
+            font-size: 1em;
+            color: var(--text-main);
+            box-sizing: border-box;
+            transition: all 0.2s;
         }
 
         select:focus, input:focus {
-            border-color: var(--primary);
-            background: rgba(0, 242, 255, 0.05);
             outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.15);
         }
 
-        .btn-container {
+        .actions {
             display: flex;
             gap: 15px;
+            margin-top: 30px;
         }
 
         button {
             flex: 1;
-            padding: 18px;
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1em;
             cursor: pointer;
-            border: 1px solid var(--primary);
-            background: rgba(0, 242, 255, 0.1);
-            color: var(--primary);
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            transition: 0.4s;
-            position: relative;
-            overflow: hidden;
+            transition: all 0.2s;
+            border: none;
         }
 
-        button:hover {
-            background: var(--primary);
-            color: #000;
-            box-shadow: 0 0 30px var(--primary);
+        #btnAnalisar {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        #btnAnalisar:hover {
+            background-color: var(--accent);
         }
 
         #btnPDF {
-            border-color: #ff00ff;
-            color: #ff00ff;
-            background: rgba(255, 0, 255, 0.05);
+            background-color: #edf2f7;
+            color: var(--primary);
+            border: 1px solid #cbd5e0;
             display: none;
         }
 
         #btnPDF:hover {
-            background: #ff00ff;
-            color: #000;
-            box-shadow: 0 0 30px #ff00ff;
+            background-color: #e2e8f0;
         }
 
         #resultado {
             margin-top: 30px;
             padding: 25px;
-            background: rgba(0, 0, 0, 0.8);
-            border: 1px dashed var(--secondary);
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 0.95em;
-            color: #a0aec0;
+            background: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            line-height: 1.6;
             display: none;
             white-space: pre-wrap;
-            max-height: 400px;
-            overflow-y: auto;
+            font-size: 0.95em;
         }
 
-        .loading-bar {
-            width: 100%;
-            height: 4px;
-            background: #111;
-            margin-bottom: 20px;
+        .loader {
+            text-align: center;
             display: none;
-            position: relative;
-            overflow: hidden;
+            padding: 20px;
         }
 
-        .loading-bar::after {
-            content: "";
-            position: absolute;
-            width: 40%;
-            height: 100%;
-            background: var(--primary);
-            box-shadow: 0 0 15px var(--primary);
-            animation: loading 1.5s infinite linear;
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: var(--accent);
+            animation: spin 1s linear infinite;
+            display: inline-block;
         }
 
-        @keyframes loading {
-            0% { left: -40%; }
-            100% { left: 100%; }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
-        /* Ajuste para o PDF */
-        .pdf-content {
+        /* Classe especial para o PDF ficar perfeito */
+        .pdf-mode {
+            padding: 40px !important;
             background: white !important;
-            color: black !important;
-            padding: 50px !important;
+            font-size: 12pt !important;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>LAI CORE</h1>
-    <div class="subtitle">System Analytics & Financial AI</div>
+    <div class="header">
+        <h1>LAI - Laboratório de IA</h1>
+        <div class="subtitle">Análise Especializada de Rescisão Contratual</div>
+    </div>
 
-    <div class="input-group">
-        <label>> IDENTIFICAR MOTIVO_SAIDA</label>
+    <div class="form-group">
+        <label>Motivo do Desligamento</label>
         <select id="motivo">
             <option value="Demissão sem Justa Causa">Demissão sem Justa Causa</option>
             <option value="Pedido de Demissão">Pedido de Demissão</option>
             <option value="Justa Causa">Justa Causa</option>
+            <option value="Rescisão Indireta">Rescisão Indireta</option>
         </select>
     </div>
 
-    <div class="input-group">
-        <label>> INPUT SALARIO_BRUTO_BRL</label>
-        <input type="number" id="salario" placeholder="0000.00">
+    <div class="form-group">
+        <label>Salário Bruto Mensal (R$)</label>
+        <input type="number" id="salario" placeholder="Ex: 3000.00">
     </div>
 
-    <div class="input-group">
-        <label>> INPUT TEMPO_SERVICO_MESES</label>
-        <input type="number" id="meses" placeholder="00">
+    <div class="form-group">
+        <label>Tempo de Empresa (Meses)</label>
+        <input type="number" id="meses" placeholder="Ex: 12">
     </div>
 
-    <div class="loading-bar" id="loadingBar"></div>
+    <div class="actions">
+        <button id="btnAnalisar" onclick="analisar()">Gerar Análise</button>
+        <button id="btnPDF" onclick="gerarPDF()">Baixar Relatório PDF</button>
+    </div>
 
-    <div class="btn-container">
-        <button id="btnAnalisar" onclick="analisar()">[ EXECUTAR ANÁLISE ]</button>
-        <button id="btnPDF" onclick="gerarPDF()">[ DOWNLOAD_REPORT.PDF ]</button>
+    <div class="loader" id="loader">
+        <div class="spinner"></div>
+        <p style="color: var(--accent); font-size: 0.9em;">Processando dados via Gemini 3...</p>
     </div>
 
     <div id="resultado"></div>
@@ -228,42 +212,42 @@
         const salario = document.getElementById('salario').value;
         const meses = document.getElementById('meses').value;
         const resDiv = document.getElementById('resultado');
-        const loadBar = document.getElementById('loadingBar');
+        const loader = document.getElementById('loader');
         const btnPDF = document.getElementById('btnPDF');
 
         if (!salario || !meses) {
-            alert("SISTEMA: Dados insuficientes.");
+            alert("Por favor, informe o salário e o tempo de empresa.");
             return;
         }
 
         resDiv.style.display = 'none';
         btnPDF.style.display = 'none';
-        loadBar.style.display = 'block';
+        loader.style.display = 'block';
 
-        const dadosPrompt = `Motivo: ${motivo}, Salário: ${salario}, Tempo: ${meses} meses.`;
+        const prompt = `Analise detalhadamente a rescisão: Motivo ${motivo}, Salário R$ ${salario}, Tempo ${meses} meses.`;
 
         try {
             const response = await fetch('/api/analise.js', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ dados: dadosPrompt })
+                body: JSON.stringify({ dados: prompt })
             });
 
             const data = await response.json();
             
             if (data.resposta) {
-                resDiv.innerHTML = "=== RELATÓRIO DE PROCESSAMENTO ===\n\n" + data.resposta;
+                resDiv.innerHTML = "<strong>PARECER TÉCNICO:</strong>\n\n" + data.resposta;
                 resDiv.style.display = 'block';
                 btnPDF.style.display = 'block';
             } else {
-                resDiv.innerText = "SYSTEM ERROR: " + (data.error || "UNKNOWN");
+                resDiv.innerText = "Erro no servidor: " + (data.error || "Inesperado");
                 resDiv.style.display = 'block';
             }
         } catch (e) {
-            resDiv.innerText = "NETWORK_FAILURE: Verifique conexão.";
+            resDiv.innerText = "Falha de conexão.";
             resDiv.style.display = 'block';
         } finally {
-            loadBar.style.display = 'none';
+            loader.style.display = 'none';
         }
     }
 
@@ -271,15 +255,14 @@
         const elemento = document.getElementById('resultado');
         const opt = {
             margin: 15,
-            filename: 'LAI-CORE-REPORT.pdf',
+            filename: 'Analise-Rescisao-LAI.pdf',
             image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 3 },
+            html2canvas: { scale: 2 },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
         
         const clone = elemento.cloneNode(true);
-        clone.classList.add('pdf-content');
-        clone.style.display = 'block';
+        clone.classList.add('pdf-mode');
         
         html2pdf().set(opt).from(clone).save();
     }
