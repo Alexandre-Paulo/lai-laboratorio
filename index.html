@@ -3,239 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LAI - Consultoria de Rescisão</title>
+    <title>LAI - Consultoria</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        /* DEFINIÇÕES DE CORES POR CLASSE */
-        body.light-mode {
-            --bg: #f7fafc;
-            --card: #ffffff;
-            --text: #2d3748;
-            --title: #1a365d;
-            --accent: #2b6cb0;
-            --border: #e2e8f0;
-            --input: #ffffff;
-            --muted: #718096;
-        }
+        body.light-mode { --bg: #f7fafc; --card: #ffffff; --text: #2d3748; --title: #1a365d; --border: #e2e8f0; }
+        body.dark-mode { --bg: #1a202c; --card: #2d3748; --text: #f7fafc; --title: #90cdf4; --border: #4a5568; }
 
-        body.dark-mode {
-            --bg: #1a202c;
-            --card: #2d3748;
-            --text: #f7fafc;
-            --title: #90cdf4;
-            --accent: #4299e1;
-            --border: #4a5568;
-            --input: #1a202c;
-            --muted: #a0aec0;
-        }
-
-        body {
-            background-color: var(--bg);
-            color: var(--text);
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            transition: 0.3s;
-        }
-
-        /* BARRA DE APARÊNCIA */
-        .theme-bar {
-            margin-bottom: 25px;
-            background: var(--card);
-            padding: 10px 20px;
-            border-radius: 50px;
-            border: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
-        .theme-label {
-            font-size: 0.75em;
-            font-weight: 800;
-            color: var(--muted);
-            letter-spacing: 1px;
-        }
-
-        .theme-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 1.3em;
-            transition: 0.2s;
-        }
-
-        .theme-btn:hover { transform: scale(1.2); }
-
-        /* CONTAINER PRINCIPAL */
-        .container {
-            width: 90%;
-            max-width: 600px;
-            background: var(--card);
-            padding: 40px;
-            border-radius: 20px;
-            border: 1px solid var(--border);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-        }
-
-        h1 { color: var(--title); text-align: center; margin: 0 0 10px 0; font-size: 1.8em; }
-        .subtitle { text-align: center; color: var(--muted); margin-bottom: 30px; font-size: 0.9em; }
-
-        label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.85em; color: var(--muted); }
+        body { background-color: var(--bg); color: var(--text); font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; transition: 0.3s; }
         
-        input, select {
-            width: 100%;
-            padding: 14px;
-            margin-bottom: 20px;
-            border-radius: 10px;
-            border: 1px solid var(--border);
-            background: var(--input);
-            color: var(--text);
-            font-size: 1em;
-            box-sizing: border-box;
-        }
+        .theme-bar { margin-bottom: 20px; background: var(--card); padding: 10px 20px; border-radius: 50px; border: 1px solid var(--border); display: flex; align-items: center; gap: 15px; }
+        .theme-btn { background: none; border: none; cursor: pointer; font-size: 1.3em; }
 
-        /* BOTÕES */
-        .btn-group { display: flex; gap: 12px; flex-wrap: wrap; }
+        .container { width: 90%; max-width: 500px; background: var(--card); padding: 40px; border-radius: 20px; border: 1px solid var(--border); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        h1 { color: var(--title); text-align: center; margin: 0; }
+        .subtitle { text-align: center; color: gray; font-size: 0.8em; margin-bottom: 25px; }
+
+        input, select { width: 100%; padding: 12px; margin-bottom: 20px; border-radius: 8px; border: 1px solid var(--border); background: transparent; color: inherit; box-sizing: border-box; }
         
-        .btn {
-            flex: 1;
-            padding: 15px;
-            border-radius: 10px;
-            font-weight: 700;
-            cursor: pointer;
-            border: none;
-            transition: 0.2s;
-            text-transform: uppercase;
-            font-size: 0.85em;
-        }
+        .btn-group { display: flex; gap: 10px; }
+        .btn { flex: 1; padding: 15px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; }
+        .btn-analisar { background: #2b6cb0; color: white; }
+        .btn-reset { background: transparent; border: 1px solid var(--border); color: inherit; }
+        .btn-pdf { background: #38a169; color: white; display: none; margin-top: 15px; width: 100%; }
 
-        .btn-analisar { background: var(--accent); color: white; }
-        .btn-reset { background: transparent; color: var(--text); border: 1px solid var(--border); }
-        .btn-pdf { background: #38a169; color: white; display: none; }
-        
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        /* ÁREA DE RESULTADO */
-        #resultado {
-            margin-top: 30px;
-            padding: 25px;
-            background: rgba(0,0,0,0.03);
-            border-radius: 12px;
-            border: 1px dashed var(--border);
-            display: none;
-            white-space: pre-wrap;
-            line-height: 1.6;
-        }
+        #resultado { margin-top: 25px; padding: 20px; border: 1px dashed var(--border); display: none; white-space: pre-wrap; }
     </style>
 </head>
 <body class="light-mode">
 
     <div class="theme-bar">
-        <span class="theme-label">APARÊNCIA:</span>
-        <button class="theme-btn" onclick="mudarTema('light')">☀️</button>
+        <span style="font-size: 0.7em; font-weight: bold;">APARÊNCIA:</span>
         <button class="theme-btn" onclick="mudarTema('dark')">🌙</button>
+        <button class="theme-btn" onclick="mudarTema('light')">☀️</button>
     </div>
 
     <div class="container">
         <h1>LAI Consultoria</h1>
-        <p class="subtitle">Análise Rescisória Especializada</p>
+        <p class="subtitle">Análise Rescisória Inteligente</p>
         
-        <label>MOTIVO DO DESLIGAMENTO</label>
+        <input type="number" id="salario" placeholder="Salário Bruto (R$)">
+        <input type="number" id="meses" placeholder="Meses de Empresa">
         <select id="motivo">
-            <option value="Demissão sem Justa Causa">Demissão sem Justa Causa</option>
             <option value="Pedido de Demissão">Pedido de Demissão</option>
-            <option value="Justa Causa">Justa Causa</option>
+            <option value="Demissão sem Justa Causa">Sem Justa Causa</option>
         </select>
-
-        <label>SALÁRIO BRUTO (R$)</label>
-        <input type="number" id="salario" placeholder="Ex: 3500">
-
-        <label>TEMPO DE EMPRESA (MESES)</label>
-        <input type="number" id="meses" placeholder="Ex: 12">
 
         <div class="btn-group">
             <button id="btnAnalisar" class="btn btn-analisar" onclick="analisar()">Gerar Análise</button>
-            <button class="btn btn-reset" onclick="novaConsulta()">Nova Consulta</button>
-            <button id="btnPDF" class="btn btn-pdf" onclick="gerarPDF()">Baixar PDF</button>
+            <button class="btn btn-reset" onclick="location.reload()">Nova Consulta</button>
         </div>
 
         <div id="resultado"></div>
+        <button id="btnPDF" class="btn btn-pdf" onclick="gerarPDF()">Baixar PDF</button>
     </div>
 
     <script>
-        // Função de Tema que você validou que está funcionando
         function mudarTema(modo) {
             document.body.className = modo + '-mode';
-            localStorage.setItem('lai_pref_theme', modo);
         }
-
-        // Recuperar preferência
-        const salvo = localStorage.getItem('lai_pref_theme');
-        if(salvo) mudarTema(salvo);
 
         async function analisar() {
             const btn = document.getElementById('btnAnalisar');
-            const resDiv = document.getElementById('resultado');
-            const s = document.getElementById('salario').value;
-            const m = document.getElementById('meses').value;
-
-            if(!s || !m) return alert("Preencha os campos de salário e meses.");
-
-            btn.disabled = true;
-            btn.innerText = "PROCESSANDO PARECER...";
-
+            const res = document.getElementById('resultado');
+            btn.innerText = "PROCESSANDO...";
+            
             try {
                 const response = await fetch('/api/analise.js', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        dados: `Salário: ${s}, Meses: ${m}, Motivo: ${document.getElementById('motivo').value}` 
-                    })
+                    body: JSON.stringify({ dados: `Salário: ${document.getElementById('salario').value}, Meses: ${document.getElementById('meses').value}, Motivo: ${document.getElementById('motivo').value}` })
                 });
                 const data = await response.json();
                 if (data.resposta) {
-                    resDiv.innerHTML = "<strong>PARECER TÉCNICO IA:</strong>\n\n" + data.resposta;
-                    resDiv.style.display = 'block';
+                    res.innerHTML = data.resposta;
+                    res.style.display = 'block';
                     document.getElementById('btnPDF').style.display = 'block';
                 } else {
-                    alert("Erro na análise: " + (data.error || "Desconhecido"));
+                    alert("Erro: " + data.error);
                 }
             } catch (e) {
-                alert("Falha de comunicação com a IA.");
+                alert("Erro de conexão.");
             } finally {
                 btn.innerText = "GERAR ANÁLISE";
-                // Trava de segurança de 5 segundos
-                setTimeout(() => { btn.disabled = false; }, 5000);
             }
         }
 
-        function novaConsulta() {
-            document.getElementById('salario').value = '';
-            document.getElementById('meses').value = '';
-            document.getElementById('resultado').style.display = 'none';
-            document.getElementById('btnPDF').style.display = 'none';
-            document.getElementById('btnAnalisar').disabled = false;
-        }
-
         function gerarPDF() {
-            const elemento = document.getElementById('resultado');
-            const opt = {
-                margin: 15,
-                filename: 'Analise_Rescisao_LAI.pdf',
-                html2canvas: { scale: 2 },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-            const clone = elemento.cloneNode(true);
-            clone.style.color = "black";
-            clone.style.background = "white";
-            clone.style.padding = "20px";
-            html2pdf().set(opt).from(clone).save();
+            html2pdf().from(document.getElementById('resultado')).save('Analise.pdf');
         }
     </script>
 </body>
