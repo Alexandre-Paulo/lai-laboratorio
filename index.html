@@ -157,10 +157,17 @@
 <body data-theme="auto">
 
     <div class="theme-selector">
-        <button class="theme-btn" onclick="setTheme('light')">☀️ Claro</button>
-        <button class="theme-btn" onclick="setTheme('dark')">🌙 Escuro</button>
-        <button class="theme-btn" onclick="setTheme('auto')">💻 Auto</button>
-    </div>
+    <span class="theme-label">APARÊNCIA:</span>
+    <button class="theme-btn" onclick="setTheme('light')">☀️ Claro</button>
+    <button class="theme-btn" onclick="setTheme('dark')">🌙 Escuro</button>
+    <button class="theme-btn" onclick="setTheme('auto')">💻 Auto</button>
+</div>.theme-label {
+    font-size: 0.75em;
+    font-weight: 700;
+    color: var(--text-muted);
+    align-self: center;
+    letter-spacing: 1px;
+}
 
     <div class="container">
         <div class="header">
