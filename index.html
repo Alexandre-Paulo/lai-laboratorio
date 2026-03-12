@@ -116,23 +116,46 @@
         function gerarPDF() {
             const content = document.getElementById('resultado').innerHTML;
             
-            // Criamos um elemento novo "invisível" só para o PDF começar do topo
-            const worker = document.createElement('div');
-            worker.style.padding = "20px";
-            worker.style.color = "#000";
-            worker.style.backgroundColor = "#fff";
-            worker.innerHTML = `<h2 style="color: #1a365d; text-align: center;">Parecer Técnico - LAI Consultoria</h2><hr><br>${content}`;
+            // Criamos o container do PDF de forma isolada e forçamos o início no topo
+            const element = document.createElement('div');
+            element.style.width = "170mm"; // Largura padrão A4 com margens
+            element.style.padding = "20px";
+            element.style.color = "#000";
+            element.style.backgroundColor = "#fff";
+            element.style.position = "absolute";
+            element.style.top = "0";
+            element.style.left = "-9999px"; // Esconde da tela mas mantém para o renderizador
+            
+            element.innerHTML = `
+                <div style="text-align: center; border-bottom: 2px solid #1a365d; padding-bottom: 10px; margin-bottom: 20px;">
+                    <h1 style="color: #1a365d; margin: 0;">LAI Consultoria</h1>
+                    <p style="color: #718096; margin: 5px 0;">Parecer Técnico Rescisório</p>
+                </div>
+                <div style="font-family: 'Segoe UI', sans-serif; line-height: 1.6;">
+                    ${content}
+                </div>
+                <div style="margin-top: 50px; border-top: 1px solid #e2e8f0; padding-top: 10px; font-size: 10px; color: #a0aec0; text-align: center;">
+                    Gerado automaticamente via Inteligência Artificial - LAI Laboratório
+                </div>
+            `;
+
+            document.body.appendChild(element);
 
             const opt = {
-                margin: 15,
+                margin: 10,
                 filename: 'Parecer_Tecnico_LAI.pdf',
                 image: { type: 'jpeg', quality: 1 },
-                html2canvas: { scale: 2, useCORS: true },
+                html2canvas: { 
+                    scale: 2, 
+                    useCORS: true,
+                    scrollY: 0 // FORÇA O INÍCIO NO TOPO DO ELEMENTO
+                },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
-            // Geramos o PDF a partir desse novo elemento limpo
-            html2pdf().set(opt).from(worker).save();
+            html2pdf().set(opt).from(element).save().then(() => {
+                document.body.removeChild(element); // Limpa a memória
+            });
         }
     </script>
 </body>
