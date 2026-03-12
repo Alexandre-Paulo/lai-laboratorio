@@ -6,62 +6,127 @@
     <title>LAI - Consultoria</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        body.light-mode { --bg: #f7fafc; --card: #ffffff; --text: #2d3748; --border: #e2e8f0; }
-        body.dark-mode { --bg: #1a202c; --card: #2d3748; --text: #f7fafc; --border: #4a5568; }
-        body { background-color: var(--bg); color: var(--text); font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; transition: 0.3s; }
-        .theme-bar { margin-bottom: 20px; background: var(--card); padding: 10px 20px; border-radius: 50px; border: 1px solid var(--border); display: flex; align-items: center; gap: 15px; }
-        .theme-btn { background: none; border: none; cursor: pointer; font-size: 1.3em; }
-        .container { width: 90%; max-width: 500px; background: var(--card); padding: 40px; border-radius: 20px; border: 1px solid var(--border); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        h1 { text-align: center; color: #2b6cb0; }
-        input, select { width: 100%; padding: 12px; margin-bottom: 20px; border-radius: 8px; border: 1px solid var(--border); background: transparent; color: inherit; box-sizing: border-box; }
+        :root {
+            /* TEMA CLARO */
+            --bg: #f7fafc; --card: #ffffff; --text: #2d3748; --title: #1a365d; --border: #e2e8f0; --accent: #2b6cb0;
+        }
+        [data-theme="dark"] {
+            /* TEMA ESCURO */
+            --bg: #1a202c; --card: #2d3748; --text: #f7fafc; --title: #90cdf4; --border: #4a5568; --accent: #4299e1;
+        }
+
+        body { 
+            background-color: var(--bg); color: var(--text); font-family: system-ui, -apple-system, sans-serif;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; transition: 0.3s;
+        }
+        
+        .theme-bar { 
+            margin-bottom: 25px; background: var(--card); padding: 8px 18px; border-radius: 50px; 
+            border: 1px solid var(--border); display: flex; align-items: center; gap: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .theme-btn { background: none; border: none; cursor: pointer; font-size: 1.2em; filter: grayscale(1); transition: 0.2s; }
+        .theme-btn:hover { filter: grayscale(0); transform: scale(1.1); }
+
+        .container { 
+            width: 90%; max-width: 500px; background: var(--card); padding: 40px; border-radius: 20px; 
+            border: 1px solid var(--border); box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+        }
+        h1 { color: var(--title); text-align: center; margin-top: 0; }
+        .subtitle { text-align: center; color: #a0aec0; font-size: 0.9em; margin-bottom: 30px; }
+
+        label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.8em; color: #718096; }
+        input, select { 
+            width: 100%; padding: 12px; margin-bottom: 20px; border-radius: 8px; 
+            border: 1px solid var(--border); background: var(--bg); color: inherit; box-sizing: border-box; 
+        }
+
         .btn-group { display: flex; gap: 10px; }
-        .btn { flex: 1; padding: 15px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; }
-        .btn-analisar { background: #2b6cb0; color: white; }
+        .btn { flex: 1; padding: 15px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-analisar { background: var(--accent); color: white; }
         .btn-reset { background: transparent; border: 1px solid var(--border); color: inherit; }
-        #resultado { margin-top: 25px; padding: 20px; border: 1px dashed var(--border); display: none; white-space: pre-wrap; }
+        .btn-pdf { background: #38a169; color: white; width: 100%; margin-top: 15px; display: none; }
+
+        #resultado { 
+            margin-top: 25px; padding: 20px; border: 1px dashed var(--border); 
+            display: none; white-space: pre-wrap; line-height: 1.6; background: rgba(0,0,0,0.02);
+        }
     </style>
 </head>
-<body class="light-mode">
+<body data-theme="light">
+
     <div class="theme-bar">
-        <span style="font-size: 0.7em; font-weight: bold;">APARÊNCIA:</span>
-        <button class="theme-btn" onclick="mudarTema('light')">☀️</button>
-        <button class="theme-btn" onclick="mudarTema('dark')">🌙</button>
+        <span style="font-size: 0.7em; font-weight: bold; color: var(--accent);">APARÊNCIA:</span>
+        <button class="theme-btn" title="Modo Claro" onclick="setTheme('light')">☀️</button>
+        <button class="theme-btn" title="Modo Escuro" onclick="setTheme('dark')">🌙</button>
     </div>
+
     <div class="container">
         <h1>LAI Consultoria</h1>
-        <input type="number" id="salario" placeholder="Salário Bruto (R$)">
-        <input type="number" id="meses" placeholder="Meses de Empresa">
+        <p class="subtitle">Análise Rescisória Inteligente</p>
+        
+        <label>MOTIVO</label>
         <select id="motivo">
-            <option value="Demissão sem Justa Causa">Sem Justa Causa</option>
+            <option value="Demissão sem Justa Causa">Demissão sem Justa Causa</option>
             <option value="Pedido de Demissão">Pedido de Demissão</option>
             <option value="Justa Causa">Justa Causa</option>
         </select>
+
+        <label>SALÁRIO BRUTO (R$)</label>
+        <input type="number" id="salario" placeholder="Ex: 3000">
+
+        <label>MESES DE EMPRESA</label>
+        <input type="number" id="meses" placeholder="Ex: 12">
+
         <div class="btn-group">
-            <button id="btnAnalisar" class="btn btn-analisar" onclick="analisar()">Gerar Análise</button>
-            <button class="btn btn-reset" onclick="location.reload()">Nova Consulta</button>
+            <button id="btnAnalisar" class="btn btn-analisar" onclick="analisar()">GERAR ANÁLISE</button>
+            <button class="btn btn-reset" onclick="location.reload()">NOVA CONSULTA</button>
         </div>
+
         <div id="resultado"></div>
+        <button id="btnPDF" class="btn btn-pdf" onclick="gerarPDF()">BAIXAR PDF</button>
     </div>
+
     <script>
-        function mudarTema(m) { document.body.className = m + '-mode'; }
+        function setTheme(theme) {
+            document.body.setAttribute('data-theme', theme);
+        }
+
         async function analisar() {
             const btn = document.getElementById('btnAnalisar');
+            const resArea = document.getElementById('resultado');
+            const pdfBtn = document.getElementById('btnPDF');
+            
             btn.innerText = "PROCESSANDO...";
+            btn.disabled = true;
+
             try {
-                // MUDAMOS A ROTA PARA CONSULTAR.JS
-                const response = await fetch('/api/consultar.js', {
+                const response = await fetch('/api/analise.js', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ dados: `Salário: ${document.getElementById('salario').value}, Meses: ${document.getElementById('meses').value}, Motivo: ${document.getElementById('motivo').value}` })
+                    body: JSON.stringify({ 
+                        dados: `Salário: ${document.getElementById('salario').value}, Meses: ${document.getElementById('meses').value}, Motivo: ${document.getElementById('motivo').value}` 
+                    })
                 });
+                
                 const data = await response.json();
                 if (data.resposta) {
-                    const res = document.getElementById('resultado');
-                    res.innerHTML = data.resposta;
-                    res.style.display = 'block';
-                } else { alert("Erro: " + (data.error || "IA indisponível")); }
-            } catch (e) { alert("Erro de conexão."); }
-            finally { btn.innerText = "GERAR ANÁLISE"; }
+                    resArea.innerHTML = "<strong>PARECER TÉCNICO:</strong>\n\n" + data.resposta;
+                    resArea.style.display = 'block';
+                    pdfBtn.style.display = 'block';
+                } else {
+                    alert("Erro da IA: " + (data.error || "Tente novamente."));
+                }
+            } catch (e) {
+                alert("Erro de conexão com o servidor.");
+            } finally {
+                btn.innerText = "GERAR ANÁLISE";
+                btn.disabled = false;
+            }
+        }
+
+        function gerarPDF() {
+            const element = document.getElementById('resultado');
+            html2pdf().from(element).save('Analise_Rescisao.pdf');
         }
     </script>
 </body>
