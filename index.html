@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LAI - Consultoria</title>
+    <title>LAI - Consultoria Inteligente</title>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     
     <style>
+        /* Variáveis de Cores para Temas */
         :root {
             --bg: #f7fafc; --card: #ffffff; --text: #2d3748; --title: #1a365d; --border: #e2e8f0; --accent: #2b6cb0;
         }
@@ -15,71 +17,84 @@
             --bg: #1a202c; --card: #2d3748; --text: #f7fafc; --title: #90cdf4; --border: #4a5568; --accent: #4299e1;
         }
 
+        /* Reset e Base */
         body { 
-            background-color: var(--bg); color: var(--text); font-family: system-ui, -apple-system, sans-serif;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; transition: 0.3s;
+            background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; padding: 20px; transition: 0.3s;
         }
         
+        /* Barra de Temas Superior */
         .theme-bar { 
-            margin-bottom: 25px; background: var(--card); padding: 8px 18px; border-radius: 50px; 
-            border: 1px solid var(--border); display: flex; align-items: center; gap: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 20px; background: var(--card); padding: 10px 20px; border-radius: 50px; 
+            border: 1px solid var(--border); display: flex; align-items: center; gap: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
-        .theme-btn { background: none; border: none; cursor: pointer; font-size: 1.2em; filter: grayscale(1); transition: 0.2s; }
-        .theme-btn:hover { filter: grayscale(0); transform: scale(1.1); }
+        .theme-btn { background: none; border: none; cursor: pointer; font-size: 1.3em; transition: 0.2s; }
+        .theme-btn:hover { transform: scale(1.2); }
 
+        /* Container Principal */
         .container { 
-            width: 90%; max-width: 600px; background: var(--card); padding: 40px; border-radius: 20px; 
-            border: 1px solid var(--border); box-shadow: 0 10px 25px rgba(0,0,0,0.1); margin: 20px 0;
+            width: 95%; max-width: 650px; background: var(--card); padding: 40px; border-radius: 24px; 
+            border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
-        h1 { color: var(--title); text-align: center; margin-top: 0; }
-        .subtitle { text-align: center; color: #a0aec0; font-size: 0.9em; margin-bottom: 30px; }
+        h1 { color: var(--title); text-align: center; margin: 0; font-size: 1.8em; }
+        .subtitle { text-align: center; color: #a0aec0; font-size: 0.9em; margin-bottom: 35px; }
 
-        label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.8em; color: #718096; }
+        /* Formulário */
+        label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.85em; color: var(--accent); text-transform: uppercase; letter-spacing: 0.5px; }
         input, select { 
-            width: 100%; padding: 12px; margin-bottom: 20px; border-radius: 8px; 
-            border: 1px solid var(--border); background: var(--bg); color: inherit; box-sizing: border-box; 
+            width: 100%; padding: 14px; margin-bottom: 25px; border-radius: 12px; 
+            border: 1px solid var(--border); background: var(--bg); color: inherit; box-sizing: border-box; font-size: 1em;
         }
 
-        .btn-group { display: flex; gap: 10px; }
-        .btn { flex: 1; padding: 15px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        /* Botões */
+        .btn-group { display: flex; gap: 12px; }
+        .btn { flex: 1; padding: 16px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 0.95em; }
         .btn-analisar { background: var(--accent); color: white; }
+        .btn-analisar:hover { opacity: 0.9; transform: translateY(-2px); }
         .btn-reset { background: transparent; border: 1px solid var(--border); color: inherit; }
-        .btn-pdf { background: #38a169; color: white; width: 100%; margin-top: 15px; display: none; }
+        .btn-pdf { background: #38a169; color: white; width: 100%; margin-top: 20px; display: none; }
 
-        /* Estilização do Resultado Renderizado */
+        /* Resultado (Área do Parecer) */
         #resultado { 
-            margin-top: 25px; padding: 25px; border: 1px solid var(--border); 
-            display: none; line-height: 1.6; background: rgba(0,0,0,0.01); border-radius: 12px;
+            margin-top: 30px; padding: 30px; border: 1px solid var(--border); 
+            display: none; line-height: 1.7; background: rgba(0,0,0,0.02); border-radius: 16px; font-size: 1.05em;
         }
-        #resultado h1, #resultado h2, #resultado h3 { color: var(--accent); margin-top: 20px; }
-        #resultado strong { color: var(--title); }
-        #resultado ul { padding-left: 20px; }
+        
+        /* Ajustes de Markdown (Como o texto aparece) */
+        #resultado h1, #resultado h2, #resultado h3 { color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+        #resultado strong { color: var(--title); font-weight: 700; }
+        #resultado p { margin-bottom: 15px; }
+
+        /* REGRA DE OURO PARA O PDF: Força texto preto mesmo se estiver no modo escuro */
+        .pdf-print { color: #000000 !important; background: #ffffff !important; }
+        .pdf-print h1, .pdf-print h2, .pdf-print h3, .pdf-print strong { color: #000000 !important; }
     </style>
 </head>
 <body data-theme="light">
 
     <div class="theme-bar">
-        <span style="font-size: 0.7em; font-weight: bold; color: var(--accent);">APARÊNCIA:</span>
+        <span style="font-size: 0.75em; font-weight: bold; color: var(--accent);">APARÊNCIA:</span>
         <button class="theme-btn" title="Modo Claro" onclick="setTheme('light')">☀️</button>
         <button class="theme-btn" title="Modo Escuro" onclick="setTheme('dark')">🌙</button>
     </div>
 
     <div class="container">
         <h1>LAI Consultoria</h1>
-        <p class="subtitle">Análise Rescisória Inteligente</p>
+        <p class="subtitle">Parecer Técnico Rescisório com Inteligência Artificial</p>
         
-        <label>MOTIVO</label>
+        <label>Motivo da Saída</label>
         <select id="motivo">
             <option value="Demissão sem Justa Causa">Demissão sem Justa Causa</option>
             <option value="Pedido de Demissão">Pedido de Demissão</option>
             <option value="Justa Causa">Justa Causa</option>
+            <option value="Acordo Comum (Reforma Trabalhista)">Acordo entre as Partes</option>
         </select>
 
-        <label>SALÁRIO BRUTO (R$)</label>
-        <input type="number" id="salario" placeholder="Ex: 3000">
+        <label>Salário Bruto Mensal (R$)</label>
+        <input type="number" id="salario" placeholder="Ex: 2500">
 
-        <label>MESES DE EMPRESA</label>
-        <input type="number" id="meses" placeholder="Ex: 12">
+        <label>Tempo de Empresa (Meses)</label>
+        <input type="number" id="meses" placeholder="Ex: 24">
 
         <div class="btn-group">
             <button id="btnAnalisar" class="btn btn-analisar" onclick="analisar()">GERAR ANÁLISE</button>
@@ -87,59 +102,74 @@
         </div>
 
         <div id="resultado"></div>
-        <button id="btnPDF" class="btn btn-pdf" onclick="gerarPDF()">BAIXAR PARECER EM PDF</button>
+        
+        <button id="btnPDF" class="btn btn-pdf" onclick="gerarPDF()">📄 BAIXAR PARECER TÉCNICO (PDF)</button>
     </div>
 
     <script>
+        // Função de Troca de Tema
         function setTheme(theme) {
             document.body.setAttribute('data-theme', theme);
         }
 
+        // Função Principal: Chama a IA
         async function analisar() {
             const btn = document.getElementById('btnAnalisar');
             const resArea = document.getElementById('resultado');
             const pdfBtn = document.getElementById('btnPDF');
             
-            btn.innerText = "PROCESSANDO...";
+            btn.innerText = "IA ESTÁ ANALISANDO...";
             btn.disabled = true;
 
             try {
-                // APONTANDO PARA A API QUE ESTÁ FUNCIONANDO
                 const response = await fetch('/api/analise.js', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
-                        dados: `Salário: ${document.getElementById('salario').value}, Meses: ${document.getElementById('meses').value}, Motivo: ${document.getElementById('motivo').value}` 
+                        dados: `Salário: R$ ${document.getElementById('salario').value}, Meses: ${document.getElementById('meses').value}, Motivo: ${document.getElementById('motivo').value}` 
                     })
                 });
                 
                 const data = await response.json();
+                
                 if (data.resposta) {
-                    // O PULO DO GATO: marked.parse transforma o texto da IA em HTML bonito
+                    // Transforma o texto bruto da IA em HTML elegante (Negritos, Títulos, etc)
                     resArea.innerHTML = marked.parse(data.resposta);
                     resArea.style.display = 'block';
                     pdfBtn.style.display = 'block';
+                    
+                    // Rola a tela suavemente para o resultado
+                    resArea.scrollIntoView({ behavior: 'smooth' });
                 } else {
-                    alert("Erro: " + (data.error || "Verifique sua cota da API."));
+                    alert("Erro do Google: " + (data.error || "Cota excedida. Aguarde 1 minuto."));
                 }
             } catch (e) {
-                alert("Erro de conexão.");
+                alert("Erro de conexão com o servidor da Vercel.");
             } finally {
                 btn.innerText = "GERAR ANÁLISE";
                 btn.disabled = false;
             }
         }
 
+        // Função de Download do PDF (Blindada contra o Modo Escuro)
         function gerarPDF() {
             const element = document.getElementById('resultado');
+            
+            // Adiciona classe para garantir texto preto no fundo branco do PDF
+            element.classList.add('pdf-print');
+
             const opt = {
-                margin: 10,
-                filename: 'Parecer_Tecnico_LAI.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
+                margin: 15,
+                filename: 'Consultoria_LAI_Parecer.pdf',
+                image: { type: 'jpeg', quality: 1 },
+                html2canvas: { scale: 3, useCORS: true },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
-            html2pdf().set(opt).from(element).save();
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                // Remove a classe para o site voltar ao normal após o download
+                element.classList.remove('pdf-print');
+            });
         }
     </script>
 </body>
