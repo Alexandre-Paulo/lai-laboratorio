@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LAI - Consultoria</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
     <style>
         :root {
-            /* TEMA CLARO */
             --bg: #f7fafc; --card: #ffffff; --text: #2d3748; --title: #1a365d; --border: #e2e8f0; --accent: #2b6cb0;
         }
         [data-theme="dark"] {
-            /* TEMA ESCURO */
             --bg: #1a202c; --card: #2d3748; --text: #f7fafc; --title: #90cdf4; --border: #4a5568; --accent: #4299e1;
         }
 
@@ -28,8 +28,8 @@
         .theme-btn:hover { filter: grayscale(0); transform: scale(1.1); }
 
         .container { 
-            width: 90%; max-width: 500px; background: var(--card); padding: 40px; border-radius: 20px; 
-            border: 1px solid var(--border); box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+            width: 90%; max-width: 600px; background: var(--card); padding: 40px; border-radius: 20px; 
+            border: 1px solid var(--border); box-shadow: 0 10px 25px rgba(0,0,0,0.1); margin: 20px 0;
         }
         h1 { color: var(--title); text-align: center; margin-top: 0; }
         .subtitle { text-align: center; color: #a0aec0; font-size: 0.9em; margin-bottom: 30px; }
@@ -46,10 +46,14 @@
         .btn-reset { background: transparent; border: 1px solid var(--border); color: inherit; }
         .btn-pdf { background: #38a169; color: white; width: 100%; margin-top: 15px; display: none; }
 
+        /* Estilização do Resultado Renderizado */
         #resultado { 
-            margin-top: 25px; padding: 20px; border: 1px dashed var(--border); 
-            display: none; white-space: pre-wrap; line-height: 1.6; background: rgba(0,0,0,0.02);
+            margin-top: 25px; padding: 25px; border: 1px solid var(--border); 
+            display: none; line-height: 1.6; background: rgba(0,0,0,0.01); border-radius: 12px;
         }
+        #resultado h1, #resultado h2, #resultado h3 { color: var(--accent); margin-top: 20px; }
+        #resultado strong { color: var(--title); }
+        #resultado ul { padding-left: 20px; }
     </style>
 </head>
 <body data-theme="light">
@@ -83,7 +87,7 @@
         </div>
 
         <div id="resultado"></div>
-        <button id="btnPDF" class="btn btn-pdf" onclick="gerarPDF()">BAIXAR PDF</button>
+        <button id="btnPDF" class="btn btn-pdf" onclick="gerarPDF()">BAIXAR PARECER EM PDF</button>
     </div>
 
     <script>
@@ -100,6 +104,7 @@
             btn.disabled = true;
 
             try {
+                // APONTANDO PARA A API QUE ESTÁ FUNCIONANDO
                 const response = await fetch('/api/analise.js', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -110,14 +115,15 @@
                 
                 const data = await response.json();
                 if (data.resposta) {
-                    resArea.innerHTML = "<strong>PARECER TÉCNICO:</strong>\n\n" + data.resposta;
+                    // O PULO DO GATO: marked.parse transforma o texto da IA em HTML bonito
+                    resArea.innerHTML = marked.parse(data.resposta);
                     resArea.style.display = 'block';
                     pdfBtn.style.display = 'block';
                 } else {
-                    alert("Erro da IA: " + (data.error || "Tente novamente."));
+                    alert("Erro: " + (data.error || "Verifique sua cota da API."));
                 }
             } catch (e) {
-                alert("Erro de conexão com o servidor.");
+                alert("Erro de conexão.");
             } finally {
                 btn.innerText = "GERAR ANÁLISE";
                 btn.disabled = false;
@@ -126,7 +132,14 @@
 
         function gerarPDF() {
             const element = document.getElementById('resultado');
-            html2pdf().from(element).save('Analise_Rescisao.pdf');
+            const opt = {
+                margin: 10,
+                filename: 'Parecer_Tecnico_LAI.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
         }
     </script>
 </body>
