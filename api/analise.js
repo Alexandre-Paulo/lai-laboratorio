@@ -4,30 +4,31 @@ export default async function handler(req, res) {
     const { dados } = req.body;
     const apiKey = process.env.GEMINI_API_KEY;
 
-    // Mudamos para v1beta para garantir compatibilidade total com o modelo flash
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    // Usando o modelo que apareceu na sua lista!
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
     try {
         const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                contents: [{ parts: [{ text: "Analise como consultor de RH: " + dados }] }]
+                contents: [{ parts: [{ text: "Atue como um consultor de RH sênior. Analise estes dados de rescisão e forneça um parecer técnico detalhado: " + dados }] }]
             })
         });
 
         const data = await response.json();
 
         if (data.error) {
-            return res.status(500).json({ error: `Google: ${data.error.message}` });
+            return res.status(500).json({ error: `Erro Google: ${data.error.message}` });
         }
 
         if (data.candidates && data.candidates[0].content) {
-            res.status(200).json({ resposta: data.candidates[0].content.parts[0].text });
+            const textoIA = data.candidates[0].content.parts[0].text;
+            res.status(200).json({ resposta: textoIA });
         } else {
-            res.status(500).json({ error: "Resposta vazia da IA." });
+            res.status(500).json({ error: "A IA não retornou dados." });
         }
     } catch (error) {
-        res.status(500).json({ error: "Falha na conexão com a API." });
+        res.status(500).json({ error: "Erro na comunicação com o servidor." });
     }
 }
