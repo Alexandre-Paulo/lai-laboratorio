@@ -4,27 +4,27 @@ export default async function handler(req, res) {
     const { dados } = req.body;
     const apiKey = process.env.GEMINI_API_KEY;
 
-    // Usando o modelo que apareceu na sua lista!
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+    // 'gemini-flash-latest' é o caminho mais seguro para fugir do erro 'limit: 0'
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`;
 
     try {
         const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                contents: [{ parts: [{ text: "Atue como um consultor de RH sênior. Analise estes dados de rescisão e forneça um parecer técnico detalhado: " + dados }] }]
+                contents: [{ parts: [{ text: "Atue como um consultor de RH sênior. Analise estes dados de rescisão e forneça um parecer técnico: " + dados }] }]
             })
         });
 
         const data = await response.json();
 
         if (data.error) {
-            return res.status(500).json({ error: `Erro Google: ${data.error.message}` });
+            // Se o erro de quota persistir, aqui ele vai nos dizer o motivo real
+            return res.status(500).json({ error: `Google: ${data.error.message}` });
         }
 
         if (data.candidates && data.candidates[0].content) {
-            const textoIA = data.candidates[0].content.parts[0].text;
-            res.status(200).json({ resposta: textoIA });
+            res.status(200).json({ resposta: data.candidates[0].content.parts[0].text });
         } else {
             res.status(500).json({ error: "A IA não retornou dados." });
         }
