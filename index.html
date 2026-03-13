@@ -22,6 +22,7 @@
             border: 1px solid var(--border); display: flex; align-items: center; gap: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
         .theme-btn { background: none; border: none; cursor: pointer; font-size: 1.3em; transition: 0.2s; }
+        .theme-btn:hover { transform: scale(1.2); }
 
         .container { 
             width: 95%; max-width: 650px; background: var(--card); padding: 40px; border-radius: 24px; 
@@ -33,7 +34,7 @@
         label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.85em; color: var(--accent); text-transform: uppercase; }
         input, select { 
             width: 100%; padding: 14px; margin-bottom: 25px; border-radius: 12px; 
-            border: 1px solid var(--border); background: var(--bg); color: inherit; box-sizing: border-box; 
+            border: 1px solid var(--border); background: var(--bg); color: inherit; box-sizing: border-box; font-size: 1em;
         }
 
         .btn-group { display: flex; gap: 12px; }
@@ -46,6 +47,10 @@
             margin-top: 30px; padding: 30px; border: 1px solid var(--border); 
             display: none; line-height: 1.7; background: rgba(0,0,0,0.02); border-radius: 16px;
         }
+        
+        /* Estilos internos para o Markdown */
+        #resultado h1, #resultado h2 { color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 5px; }
+        #resultado strong { color: var(--title); }
     </style>
 </head>
 <body data-theme="light">
@@ -58,28 +63,29 @@
 
     <div class="container">
         <h1>LAI Consultoria</h1>
-        <p class="subtitle">Análise Rescisória com IA</p>
+        <p class="subtitle">Análise Rescisória Inteligente (Gemini 2.0)</p>
         
-        <label>Motivo</label>
+        <label>Motivo da Rescisão</label>
         <select id="motivo">
             <option value="Demissão sem Justa Causa">Demissão sem Justa Causa</option>
             <option value="Pedido de Demissão">Pedido de Demissão</option>
             <option value="Justa Causa">Justa Causa</option>
+            <option value="Acordo entre as Partes">Acordo entre as Partes</option>
         </select>
 
         <label>Salário Bruto (R$)</label>
-        <input type="number" id="salario" placeholder="Ex: 3000">
+        <input type="number" id="salario" placeholder="Ex: 3500">
 
         <label>Meses de Empresa</label>
-        <input type="number" id="meses" placeholder="Ex: 12">
+        <input type="number" id="meses" placeholder="Ex: 24">
 
         <div class="btn-group">
             <button id="btnAnalisar" class="btn btn-analisar" onclick="analisar()">GERAR ANÁLISE</button>
-            <button class="btn btn-reset" onclick="location.reload()">LIMPAR</button>
+            <button class="btn btn-reset" onclick="location.reload()">LIMPAR TUDO</button>
         </div>
 
         <div id="resultado"></div>
-        <button id="btnPDF" class="btn btn-pdf" onclick="gerarPDF()">📄 BAIXAR PARECER EM PDF</button>
+        <button id="btnPDF" class="btn btn-pdf" onclick="gerarPDF()">📄 BAIXAR PARECER TÉCNICO (PDF)</button>
     </div>
 
     <script>
@@ -89,7 +95,8 @@
             const btn = document.getElementById('btnAnalisar');
             const resArea = document.getElementById('resultado');
             const pdfBtn = document.getElementById('btnPDF');
-            btn.innerText = "ANALISANDO...";
+            
+            btn.innerText = "IA PROCESSANDO...";
             btn.disabled = true;
 
             try {
@@ -100,62 +107,66 @@
                         dados: `Salário: R$ ${document.getElementById('salario').value}, Meses: ${document.getElementById('meses').value}, Motivo: ${document.getElementById('motivo').value}` 
                     })
                 });
+                
                 const data = await response.json();
+                
                 if (data.resposta) {
+                    // Transforma o texto da IA em HTML bonito
                     resArea.innerHTML = marked.parse(data.resposta);
                     resArea.style.display = 'block';
                     pdfBtn.style.display = 'block';
                     resArea.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    alert("Aviso: " + (data.error || "Tente novamente em instantes."));
                 }
-            } catch (e) { alert("Erro de conexão."); } finally {
+            } catch (e) {
+                alert("Erro de conexão com o servidor.");
+            } finally {
                 btn.innerText = "GERAR ANÁLISE";
                 btn.disabled = false;
             }
         }
 
+        // FUNÇÃO DE PDF TOTALMENTE ISOLADA (O FIM DAS PÁGINAS EM BRANCO)
         function gerarPDF() {
-            const content = document.getElementById('resultado').innerHTML;
+            const conteudoIA = document.getElementById('resultado').innerHTML;
             
-            // Criamos o container do PDF de forma isolada e forçamos o início no topo
-            const element = document.createElement('div');
-            element.style.width = "170mm"; // Largura padrão A4 com margens
-            element.style.padding = "20px";
-            element.style.color = "#000";
-            element.style.backgroundColor = "#fff";
-            element.style.position = "absolute";
-            element.style.top = "0";
-            element.style.left = "-9999px"; // Esconde da tela mas mantém para o renderizador
+            // Criamos uma folha de papel virtual
+            const folha = document.createElement('div');
             
-            element.innerHTML = `
-                <div style="text-align: center; border-bottom: 2px solid #1a365d; padding-bottom: 10px; margin-bottom: 20px;">
-                    <h1 style="color: #1a365d; margin: 0;">LAI Consultoria</h1>
-                    <p style="color: #718096; margin: 5px 0;">Parecer Técnico Rescisório</p>
+            // Estilizamos a folha para ser idêntica a um documento oficial
+            folha.style.padding = "20px";
+            folha.style.color = "#000000";
+            folha.style.backgroundColor = "#ffffff";
+            folha.style.fontFamily = "Arial, sans-serif";
+
+            folha.innerHTML = `
+                <div style="text-align: center; border-bottom: 2px solid #1a365d; padding-bottom: 15px; margin-bottom: 25px;">
+                    <h1 style="color: #1a365d; margin: 0; font-size: 22pt;">LAI Consultoria</h1>
+                    <p style="color: #4a5568; margin: 5px 0; font-size: 10pt; text-transform: uppercase; letter-spacing: 1px;">Parecer Técnico de Rescisão Contratual</p>
                 </div>
-                <div style="font-family: 'Segoe UI', sans-serif; line-height: 1.6;">
-                    ${content}
+                <div style="line-height: 1.6; font-size: 11pt; text-align: justify;">
+                    ${conteudoIA}
                 </div>
-                <div style="margin-top: 50px; border-top: 1px solid #e2e8f0; padding-top: 10px; font-size: 10px; color: #a0aec0; text-align: center;">
-                    Gerado automaticamente via Inteligência Artificial - LAI Laboratório
+                <div style="margin-top: 40px; border-top: 1px solid #e2e8f0; padding-top: 10px; font-size: 9pt; color: #718096; text-align: center;">
+                    Este documento foi gerado por Inteligência Artificial e deve ser validado por um profissional contábil ou jurídico.
                 </div>
             `;
 
-            document.body.appendChild(element);
-
             const opt = {
-                margin: 10,
+                margin: [15, 15],
                 filename: 'Parecer_Tecnico_LAI.pdf',
                 image: { type: 'jpeg', quality: 1 },
                 html2canvas: { 
                     scale: 2, 
                     useCORS: true,
-                    scrollY: 0 // FORÇA O INÍCIO NO TOPO DO ELEMENTO
+                    scrollY: 0 // Comando crucial para não pular páginas
                 },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
-            html2pdf().set(opt).from(element).save().then(() => {
-                document.body.removeChild(element); // Limpa a memória
-            });
+            // Dispara o PDF usando a folha isolada
+            html2pdf().set(opt).from(folha).save();
         }
     </script>
 </body>
