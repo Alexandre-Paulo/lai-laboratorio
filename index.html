@@ -22,20 +22,26 @@
             border: 1px solid var(--border); display: flex; align-items: center; gap: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
         .theme-btn { background: none; border: none; cursor: pointer; font-size: 1.3em; transition: 0.2s; }
-        .theme-btn:hover { transform: scale(1.2); }
 
         .container { 
             width: 95%; max-width: 650px; background: var(--card); padding: 40px; border-radius: 24px; 
             border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
         h1 { color: var(--title); text-align: center; margin: 0; }
-        .subtitle { text-align: center; color: #a0aec0; font-size: 0.9em; margin-bottom: 35px; }
+        .subtitle { text-align: center; color: #a0aec0; font-size: 0.9em; margin-bottom: 30px; }
 
         label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.85em; color: var(--accent); text-transform: uppercase; }
         input, select { 
-            width: 100%; padding: 14px; margin-bottom: 25px; border-radius: 12px; 
+            width: 100%; padding: 14px; margin-bottom: 20px; border-radius: 12px; 
             border: 1px solid var(--border); background: var(--bg); color: inherit; box-sizing: border-box; font-size: 1em;
         }
+
+        /* Área de Campos Dinâmicos */
+        .hidden-fields { 
+            display: none; background: rgba(43, 108, 176, 0.05); padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 1px dashed var(--accent);
+        }
+        .checkbox-group { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; cursor: pointer; }
+        .checkbox-group input { width: auto; margin: 0; }
 
         .btn-group { display: flex; gap: 12px; }
         .btn { flex: 1; padding: 16px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
@@ -47,10 +53,6 @@
             margin-top: 30px; padding: 30px; border: 1px solid var(--border); 
             display: none; line-height: 1.7; background: rgba(0,0,0,0.02); border-radius: 16px;
         }
-        
-        /* Estilos internos para o Markdown */
-        #resultado h1, #resultado h2 { color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 5px; }
-        #resultado strong { color: var(--title); }
     </style>
 </head>
 <body data-theme="light">
@@ -63,25 +65,42 @@
 
     <div class="container">
         <h1>LAI Consultoria</h1>
-        <p class="subtitle">Análise Rescisória Inteligente (Gemini 2.0)</p>
+        <p class="subtitle">Análise Rescisória Inteligente (Versão 2.1)</p>
         
         <label>Motivo da Rescisão</label>
-        <select id="motivo">
+        <select id="motivo" onchange="toggleCamposExtras()">
             <option value="Demissão sem Justa Causa">Demissão sem Justa Causa</option>
             <option value="Pedido de Demissão">Pedido de Demissão</option>
             <option value="Justa Causa">Justa Causa</option>
             <option value="Acordo entre as Partes">Acordo entre as Partes</option>
         </select>
 
-        <label>Salário Bruto (R$)</label>
-        <input type="number" id="salario" placeholder="Ex: 3500">
+        <label>Salário Bruto Base (R$)</label>
+        <input type="number" id="salario" placeholder="Ex: 2500">
 
-        <label>Meses de Empresa</label>
-        <input type="number" id="meses" placeholder="Ex: 24">
+        <div id="camposExtras" class="hidden-fields">
+            <label>Média de Verbas Variáveis (R$)</label>
+            <small style="display:block; margin-bottom:10px; color:#718096;">Comissões, Horas Extras, Adicionais</small>
+            <input type="number" id="variaveis" placeholder="Ex: 450" value="0">
+
+            <label class="checkbox-group">
+                <input type="checkbox" id="experiencia" onchange="toggleAntecipada()"> 
+                É Contrato de Experiência?
+            </label>
+
+            <div id="areaAntecipada" style="display:none; margin-left: 25px;">
+                <label class="checkbox-group">
+                    <input type="checkbox" id="antecipada"> Houve quebra antecipada?
+                </label>
+            </div>
+        </div>
+
+        <label>Tempo de Empresa (Meses)</label>
+        <input type="number" id="meses" placeholder="Ex: 12">
 
         <div class="btn-group">
             <button id="btnAnalisar" class="btn btn-analisar" onclick="analisar()">GERAR ANÁLISE</button>
-            <button class="btn btn-reset" onclick="location.reload()">LIMPAR TUDO</button>
+            <button class="btn btn-reset" onclick="location.reload()">LIMPAR</button>
         </div>
 
         <div id="resultado"></div>
@@ -91,82 +110,85 @@
     <script>
         function setTheme(theme) { document.body.setAttribute('data-theme', theme); }
 
+        // Mostra/Esconde Verbas Variáveis e Experiência conforme o Motivo
+        function toggleCamposExtras() {
+            const motivo = document.getElementById('motivo').value;
+            const extras = document.getElementById('camposExtras');
+            // Só não mostramos extras em Justa Causa para manter o foco
+            extras.style.display = (motivo === "Justa Causa") ? "none" : "block";
+        }
+
+        // Mostra opção de quebra antecipada apenas se for Experiência
+        function toggleAntecipada() {
+            const isExp = document.getElementById('experiencia').checked;
+            document.getElementById('areaAntecipada').style.display = isExp ? "block" : "none";
+        }
+
         async function analisar() {
             const btn = document.getElementById('btnAnalisar');
             const resArea = document.getElementById('resultado');
             const pdfBtn = document.getElementById('btnPDF');
-            
-            btn.innerText = "IA PROCESSANDO...";
+            btn.innerText = "PROCESSANDO...";
             btn.disabled = true;
+
+            // Coleta de dados avançada
+            const dadosColetados = {
+                motivo: document.getElementById('motivo').value,
+                salario: document.getElementById('salario').value,
+                meses: document.getElementById('meses').value,
+                variaveis: document.getElementById('variaveis').value,
+                isExperiencia: document.getElementById('experiencia').checked,
+                isAntecipada: document.getElementById('antecipada').checked
+            };
 
             try {
                 const response = await fetch('/api/analise.js', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
-                        dados: `Salário: R$ ${document.getElementById('salario').value}, Meses: ${document.getElementById('meses').value}, Motivo: ${document.getElementById('motivo').value}` 
+                        dados: `Motivo: ${dadosColetados.motivo}, Salário Base: R$ ${dadosColetados.salario}, Média Variáveis: R$ ${dadosColetados.variaveis}, Tempo: ${dadosColetados.meses} meses, Contrato Experiência: ${dadosColetados.isExperiencia ? 'Sim' : 'Não'}, Quebra Antecipada: ${dadosColetados.isAntecipada ? 'Sim' : 'Não'}.` 
                     })
                 });
                 
                 const data = await response.json();
-                
                 if (data.resposta) {
-                    // Transforma o texto da IA em HTML bonito
                     resArea.innerHTML = marked.parse(data.resposta);
                     resArea.style.display = 'block';
                     pdfBtn.style.display = 'block';
                     resArea.scrollIntoView({ behavior: 'smooth' });
-                } else {
-                    alert("Aviso: " + (data.error || "Tente novamente em instantes."));
                 }
-            } catch (e) {
-                alert("Erro de conexão com o servidor.");
-            } finally {
+            } catch (e) { alert("Erro de conexão."); } finally {
                 btn.innerText = "GERAR ANÁLISE";
                 btn.disabled = false;
             }
         }
 
-        // FUNÇÃO DE PDF TOTALMENTE ISOLADA (O FIM DAS PÁGINAS EM BRANCO)
         function gerarPDF() {
-            const conteudoIA = document.getElementById('resultado').innerHTML;
-            
-            // Criamos uma folha de papel virtual
+            const content = document.getElementById('resultado').innerHTML;
             const folha = document.createElement('div');
-            
-            // Estilizamos a folha para ser idêntica a um documento oficial
             folha.style.padding = "20px";
-            folha.style.color = "#000000";
-            folha.style.backgroundColor = "#ffffff";
+            folha.style.color = "#000";
+            folha.style.backgroundColor = "#fff";
             folha.style.fontFamily = "Arial, sans-serif";
 
             folha.innerHTML = `
                 <div style="text-align: center; border-bottom: 2px solid #1a365d; padding-bottom: 15px; margin-bottom: 25px;">
-                    <h1 style="color: #1a365d; margin: 0; font-size: 22pt;">LAI Consultoria</h1>
-                    <p style="color: #4a5568; margin: 5px 0; font-size: 10pt; text-transform: uppercase; letter-spacing: 1px;">Parecer Técnico de Rescisão Contratual</p>
+                    <h1 style="color: #1a365d; margin: 0; font-size: 20pt;">LAI Consultoria</h1>
+                    <p style="color: #4a5568; margin: 5px 0; font-size: 10pt;">Parecer Técnico Rescisório Profissional</p>
                 </div>
-                <div style="line-height: 1.6; font-size: 11pt; text-align: justify;">
-                    ${conteudoIA}
-                </div>
-                <div style="margin-top: 40px; border-top: 1px solid #e2e8f0; padding-top: 10px; font-size: 9pt; color: #718096; text-align: center;">
-                    Este documento foi gerado por Inteligência Artificial e deve ser validado por um profissional contábil ou jurídico.
+                <div style="line-height: 1.6; font-size: 11pt;">${content}</div>
+                <div style="margin-top: 40px; border-top: 1px solid #eee; padding-top: 10px; font-size: 9pt; color: #999; text-align: center;">
+                    Documento gerado via IA - LAI Laboratório. Validar juridicamente.
                 </div>
             `;
 
-            const opt = {
-                margin: [15, 15],
+            html2pdf().set({
+                margin: 15,
                 filename: 'Parecer_Tecnico_LAI.pdf',
                 image: { type: 'jpeg', quality: 1 },
-                html2canvas: { 
-                    scale: 2, 
-                    useCORS: true,
-                    scrollY: 0 // Comando crucial para não pular páginas
-                },
+                html2canvas: { scale: 2, scrollY: 0 },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-
-            // Dispara o PDF usando a folha isolada
-            html2pdf().set(opt).from(folha).save();
+            }).from(folha).save();
         }
     </script>
 </body>
