@@ -3,192 +3,198 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LAI - Consultoria Inteligente</title>
+    <title>LAI Laboratório - Ecossistema de Inteligência</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     
     <style>
-        :root { --bg: #f7fafc; --card: #ffffff; --text: #2d3748; --title: #1a365d; --border: #e2e8f0; --accent: #2b6cb0; }
+        :root { --bg: #f0f2f5; --card: #ffffff; --text: #2d3748; --title: #1a365d; --border: #e2e8f0; --accent: #2b6cb0; --success: #38a169; }
         [data-theme="dark"] { --bg: #1a202c; --card: #2d3748; --text: #f7fafc; --title: #90cdf4; --border: #4a5568; --accent: #4299e1; }
 
         body { 
-            background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif;
-            display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; padding: 20px; transition: 0.3s;
+            background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif;
+            margin: 0; transition: 0.3s; display: flex; flex-direction: column; align-items: center;
         }
+
+        /* BARRA SUPERIOR */
+        .navbar { 
+            width: 100%; background: var(--card); padding: 15px 0; border-bottom: 1px solid var(--border);
+            display: flex; justify-content: center; position: sticky; top: 0; z-index: 100;
+        }
+        .nav-content { width: 90%; max-width: 1000px; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-weight: bold; color: var(--title); cursor: pointer; font-size: 1.2rem; }
+
+        /* DASHBOARD (HOME) */
+        #dashboard { 
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+            gap: 25px; width: 90%; max-width: 1000px; padding: 40px 0;
+        }
+        .tool-card { 
+            background: var(--card); padding: 30px; border-radius: 20px; border: 1px solid var(--border);
+            text-align: center; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .tool-card:hover { transform: translateY(-5px); border-color: var(--accent); box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
+        .tool-card i { font-size: 2.5rem; display: block; margin-bottom: 15px; }
+        .tool-card h3 { margin: 10px 0; color: var(--title); }
+        .tool-card p { font-size: 0.9rem; color: #718096; }
+
+        /* CONTENTORES DAS FERRAMENTAS */
+        .tool-page { display: none; width: 95%; max-width: 700px; padding: 40px 0; }
+        .container { background: var(--card); padding: 40px; border-radius: 24px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
         
-        .theme-bar { 
-            margin-bottom: 20px; background: var(--card); padding: 10px 20px; border-radius: 50px; 
-            border: 1px solid var(--border); display: flex; align-items: center; gap: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        }
-        .theme-btn { background: none; border: none; cursor: pointer; font-size: 1.3em; transition: 0.2s; }
-
-        .container { 
-            width: 95%; max-width: 650px; background: var(--card); padding: 40px; border-radius: 24px; 
-            border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
-        h1 { color: var(--title); text-align: center; margin: 0; }
-        .subtitle { text-align: center; color: #a0aec0; font-size: 0.9em; margin-bottom: 30px; }
-
+        /* ESTILOS FORMULÁRIO (REUTILIZADOS) */
         label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.85em; color: var(--accent); text-transform: uppercase; }
-        input, select { 
-            width: 100%; padding: 14px; margin-bottom: 20px; border-radius: 12px; 
-            border: 1px solid var(--border); background: var(--bg); color: inherit; box-sizing: border-box; font-size: 1em;
-        }
-
-        /* Área de Campos Dinâmicos */
-        .hidden-fields { 
-            display: none; background: rgba(43, 108, 176, 0.05); padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 1px dashed var(--accent);
-        }
-        .checkbox-group { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; cursor: pointer; }
-        .checkbox-group input { width: auto; margin: 0; }
-
+        input, select { width: 100%; padding: 14px; margin-bottom: 20px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg); color: inherit; box-sizing: border-box; }
+        .hidden-fields { display: none; background: rgba(43, 108, 176, 0.05); padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 1px dashed var(--accent); }
         .btn-group { display: flex; gap: 12px; }
         .btn { flex: 1; padding: 16px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .btn-analisar { background: var(--accent); color: white; }
-        .btn-reset { background: transparent; border: 1px solid var(--border); color: inherit; }
-        .btn-pdf { background: #38a169; color: white; width: 100%; margin-top: 20px; display: none; }
+        .btn-primary { background: var(--accent); color: white; }
+        .btn-pdf { background: var(--success); color: white; width: 100%; margin-top: 20px; display: none; }
+        #resultado { margin-top: 30px; padding: 25px; border: 1px solid var(--border); display: none; line-height: 1.7; background: rgba(0,0,0,0.02); border-radius: 16px; }
 
-        #resultado { 
-            margin-top: 30px; padding: 30px; border: 1px solid var(--border); 
-            display: none; line-height: 1.7; background: rgba(0,0,0,0.02); border-radius: 16px;
-        }
+        .back-btn { margin-bottom: 20px; cursor: pointer; color: var(--accent); font-weight: bold; display: flex; align-items: center; gap: 5px; }
     </style>
 </head>
 <body data-theme="light">
 
-    <div class="theme-bar">
-        <span style="font-size: 0.75em; font-weight: bold; color: var(--accent);">APARÊNCIA:</span>
-        <button class="theme-btn" onclick="setTheme('light')">☀️</button>
-        <button class="theme-btn" onclick="setTheme('dark')">🌙</button>
-    </div>
-
-    <div class="container">
-        <h1>LAI Consultoria</h1>
-        <p class="subtitle">Análise Rescisória Inteligente (Versão 2.1)</p>
-        
-        <label>Motivo da Rescisão</label>
-        <select id="motivo" onchange="toggleCamposExtras()">
-            <option value="Demissão sem Justa Causa">Demissão sem Justa Causa</option>
-            <option value="Pedido de Demissão">Pedido de Demissão</option>
-            <option value="Justa Causa">Justa Causa</option>
-            <option value="Acordo entre as Partes">Acordo entre as Partes</option>
-        </select>
-
-        <label>Salário Bruto Base (R$)</label>
-        <input type="number" id="salario" placeholder="Ex: 2500">
-
-        <div id="camposExtras" class="hidden-fields">
-            <label>Média de Verbas Variáveis (R$)</label>
-            <small style="display:block; margin-bottom:10px; color:#718096;">Comissões, Horas Extras, Adicionais</small>
-            <input type="number" id="variaveis" placeholder="Ex: 450" value="0">
-
-            <label class="checkbox-group">
-                <input type="checkbox" id="experiencia" onchange="toggleAntecipada()"> 
-                É Contrato de Experiência?
-            </label>
-
-            <div id="areaAntecipada" style="display:none; margin-left: 25px;">
-                <label class="checkbox-group">
-                    <input type="checkbox" id="antecipada"> Houve quebra antecipada?
-                </label>
+    <div class="navbar">
+        <div class="nav-content">
+            <div class="logo" onclick="showPage('dashboard')">LAI LABORATÓRIO</div>
+            <div>
+                <button style="background:none; border:none; cursor:pointer;" onclick="setTheme('light')">☀️</button>
+                <button style="background:none; border:none; cursor:pointer;" onclick="setTheme('dark')">🌙</button>
             </div>
         </div>
+    </div>
 
-        <label>Tempo de Empresa (Meses)</label>
-        <input type="number" id="meses" placeholder="Ex: 12">
-
-        <div class="btn-group">
-            <button id="btnAnalisar" class="btn btn-analisar" onclick="analisar()">GERAR ANÁLISE</button>
-            <button class="btn btn-reset" onclick="location.reload()">LIMPAR</button>
+    <div id="dashboard">
+        <div class="tool-card" onclick="showPage('page-rescisao')">
+            <span>⚖️</span>
+            <h3>Consultor de Rescisão</h3>
+            <p>Análise detalhada de verbas, multas e parecer técnico jurídico.</p>
         </div>
+        <div class="tool-card" onclick="showPage('page-ferias')">
+            <span>🏖️</span>
+            <h3>Calculadora de Férias</h3>
+            <p>Planeamento inteligente de descanso e cálculo de 1/3 e abono.</p>
+        </div>
+        <div class="tool-card" style="opacity: 0.6; cursor: not-allowed;">
+            <span>⏱️</span>
+            <h3>Horas Extras</h3>
+            <p>Em breve: Simulador de jornada e reflexos em DSR.</p>
+        </div>
+    </div>
 
-        <div id="resultado"></div>
-        <button id="btnPDF" class="btn btn-pdf" onclick="gerarPDF()">📄 BAIXAR PARECER TÉCNICO (PDF)</button>
+    <div id="page-rescisao" class="tool-page">
+        <div class="back-btn" onclick="showPage('dashboard')">← Voltar ao Menu</div>
+        <div class="container">
+            <h1>Consultoria de Rescisão</h1>
+            <p style="text-align:center; color:#718096; margin-bottom:30px;">Análise Inteligente Gemini 2.0</p>
+            
+            <label>Motivo</label>
+            <select id="motivo" onchange="toggleCamposExtras()">
+                <option value="Demissão sem Justa Causa">Demissão sem Justa Causa</option>
+                <option value="Pedido de Demissão">Pedido de Demissão</option>
+                <option value="Justa Causa">Justa Causa</option>
+                <option value="Acordo entre as Partes">Acordo entre as Partes</option>
+            </select>
+
+            <label>Salário Bruto (R$)</label>
+            <input type="number" id="salario" placeholder="Ex: 2500">
+
+            <div id="camposExtras" class="hidden-fields">
+                <label>Média Variáveis (R$)</label>
+                <input type="number" id="variaveis" value="0">
+                <label style="text-transform:none; display:flex; gap:10px; cursor:pointer;">
+                    <input type="checkbox" id="experiencia" style="width:auto;" onchange="document.getElementById('areaAntecipada').style.display = this.checked ? 'block' : 'none'"> É Experiência?
+                </label>
+                <div id="areaAntecipada" style="display:none; margin-left:20px;">
+                    <label style="text-transform:none; display:flex; gap:10px; cursor:pointer;">
+                        <input type="checkbox" id="antecipada" style="width:auto;"> Antecipada?
+                    </label>
+                </div>
+            </div>
+
+            <label>Meses de Empresa</label>
+            <input type="number" id="meses" placeholder="Ex: 12">
+
+            <div class="btn-group">
+                <button id="btnAnalisar" class="btn btn-primary" onclick="analisarRescisao()">GERAR PARECER</button>
+            </div>
+
+            <div id="resultado"></div>
+            <button id="btnPDF" class="btn btn-pdf" onclick="gerarPDF()">📄 BAIXAR PDF</button>
+        </div>
+    </div>
+
+    <div id="page-ferias" class="tool-page">
+        <div class="back-btn" onclick="showPage('dashboard')">← Voltar ao Menu</div>
+        <div class="container">
+            <h1>Calculadora de Férias</h1>
+            <p style="text-align:center; color:#718096; margin-bottom:30px;">Planeamento Inteligente de Descanso</p>
+            
+            <label>Salário Bruto (R$)</label>
+            <input type="number" id="salarioFerias" placeholder="Ex: 3000">
+
+            <label>Dias de Gozo</label>
+            <select id="diasFerias">
+                <option value="30">30 dias</option>
+                <option value="20">20 dias (com venda de 10 dias)</option>
+                <option value="15">15 dias</option>
+            </select>
+
+            <label>Data Pretendida para Início</label>
+            <input type="date" id="dataInicio">
+
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="alert('Vamos programar a lógica da IA para Férias agora!')">ANALISAR MELHOR PERÍODO</button>
+            </div>
+        </div>
     </div>
 
     <script>
         function setTheme(theme) { document.body.setAttribute('data-theme', theme); }
+        
+        function showPage(pageId) {
+            document.querySelectorAll('.tool-page, #dashboard').forEach(p => p.style.display = 'none');
+            document.getElementById(pageId).style.display = (pageId === 'dashboard') ? 'grid' : 'block';
+            window.scrollTo(0,0);
+        }
 
-        // Mostra/Esconde Verbas Variáveis e Experiência conforme o Motivo
         function toggleCamposExtras() {
-            const motivo = document.getElementById('motivo').value;
-            const extras = document.getElementById('camposExtras');
-            // Só não mostramos extras em Justa Causa para manter o foco
-            extras.style.display = (motivo === "Justa Causa") ? "none" : "block";
+            const m = document.getElementById('motivo').value;
+            document.getElementById('camposExtras').style.display = (m === "Justa Causa") ? "none" : "block";
         }
 
-        // Mostra opção de quebra antecipada apenas se for Experiência
-        function toggleAntecipada() {
-            const isExp = document.getElementById('experiencia').checked;
-            document.getElementById('areaAntecipada').style.display = isExp ? "block" : "none";
-        }
-
-        async function analisar() {
+        async function analisarRescisao() {
             const btn = document.getElementById('btnAnalisar');
-            const resArea = document.getElementById('resultado');
-            const pdfBtn = document.getElementById('btnPDF');
-            btn.innerText = "PROCESSANDO...";
-            btn.disabled = true;
+            const res = document.getElementById('resultado');
+            btn.innerText = "IA ANALISANDO..."; btn.disabled = true;
 
-            // Coleta de dados avançada
-            const dadosColetados = {
-                motivo: document.getElementById('motivo').value,
-                salario: document.getElementById('salario').value,
-                meses: document.getElementById('meses').value,
-                variaveis: document.getElementById('variaveis').value,
-                isExperiencia: document.getElementById('experiencia').checked,
-                isAntecipada: document.getElementById('antecipada').checked
-            };
+            const prompt = `Motivo: ${document.getElementById('motivo').value}, Salário: R$ ${document.getElementById('salario').value}, Meses: ${document.getElementById('meses').value}, Variáveis: R$ ${document.getElementById('variaveis').value}, Experiência: ${document.getElementById('experiencia').checked}, Antecipada: ${document.getElementById('antecipada').checked}.`;
 
             try {
                 const response = await fetch('/api/analise.js', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        dados: `Motivo: ${dadosColetados.motivo}, Salário Base: R$ ${dadosColetados.salario}, Média Variáveis: R$ ${dadosColetados.variaveis}, Tempo: ${dadosColetados.meses} meses, Contrato Experiência: ${dadosColetados.isExperiencia ? 'Sim' : 'Não'}, Quebra Antecipada: ${dadosColetados.isAntecipada ? 'Sim' : 'Não'}.` 
-                    })
+                    body: JSON.stringify({ dados: prompt })
                 });
-                
                 const data = await response.json();
                 if (data.resposta) {
-                    resArea.innerHTML = marked.parse(data.resposta);
-                    resArea.style.display = 'block';
-                    pdfBtn.style.display = 'block';
-                    resArea.scrollIntoView({ behavior: 'smooth' });
+                    res.innerHTML = marked.parse(data.resposta);
+                    res.style.display = 'block';
+                    document.getElementById('btnPDF').style.display = 'block';
                 }
-            } catch (e) { alert("Erro de conexão."); } finally {
-                btn.innerText = "GERAR ANÁLISE";
-                btn.disabled = false;
-            }
+            } catch (e) { alert("Erro na API."); } finally { btn.innerText = "GERAR PARECER"; btn.disabled = false; }
         }
 
         function gerarPDF() {
             const content = document.getElementById('resultado').innerHTML;
             const folha = document.createElement('div');
-            folha.style.padding = "20px";
-            folha.style.color = "#000";
-            folha.style.backgroundColor = "#fff";
-            folha.style.fontFamily = "Arial, sans-serif";
-
-            folha.innerHTML = `
-                <div style="text-align: center; border-bottom: 2px solid #1a365d; padding-bottom: 15px; margin-bottom: 25px;">
-                    <h1 style="color: #1a365d; margin: 0; font-size: 20pt;">LAI Consultoria</h1>
-                    <p style="color: #4a5568; margin: 5px 0; font-size: 10pt;">Parecer Técnico Rescisório Profissional</p>
-                </div>
-                <div style="line-height: 1.6; font-size: 11pt;">${content}</div>
-                <div style="margin-top: 40px; border-top: 1px solid #eee; padding-top: 10px; font-size: 9pt; color: #999; text-align: center;">
-                    Documento gerado via IA - LAI Laboratório. Validar juridicamente.
-                </div>
-            `;
-
-            html2pdf().set({
-                margin: 15,
-                filename: 'Parecer_Tecnico_LAI.pdf',
-                image: { type: 'jpeg', quality: 1 },
-                html2canvas: { scale: 2, scrollY: 0 },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            }).from(folha).save();
+            folha.style.padding = "20px"; folha.style.color = "#000"; folha.style.backgroundColor = "#fff";
+            folha.innerHTML = `<div style="text-align:center; border-bottom:2px solid #1a365d; margin-bottom:20px;"><h1>LAI Consultoria</h1><p>Parecer Técnico</p></div>${content}`;
+            html2pdf().set({ margin: 15, filename: 'Parecer_LAI.pdf', html2canvas: { scale: 2, scrollY: 0 } }).from(folha).save();
         }
     </script>
 </body>
